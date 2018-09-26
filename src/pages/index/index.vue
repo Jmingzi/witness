@@ -1,108 +1,113 @@
 <template>
-  <div class="container" @click="clickHandle('test click', $event)">
-
-    <div class="userinfo" @click="bindViewTap">
-      <!--<img class="userinfo-avatar" v-if="userInfo.avatarUrl" :src="userInfo.avatarUrl" background-size="cover" />-->
-      <!--<div class="userinfo-nickname">-->
-        <!--<card :text="userInfo.nickName"></card>-->
-      <!--</div>-->
-      <open-data type="userAvatarUrl" />
+  <div class="container">
+    <div class="welcome w-94 f-14">
+      <img src="../../images/logo.jpg">
+      <p>见证承诺，见证时刻</p>
     </div>
 
-    <van-button type="primary">按钮</van-button>
+    <div class="tab__list center w-94 f-14">
+      <div
+        class="tab center tab__from-me"
+        hover-class="tab__hover"
+        hover-start-time="0"
+        hover-stay-time="100"
+      >
+        <van-icon name="edit-data" size="30px" />
+        <span class="tab__label">我创建的</span>
+      </div>
+      <div
+        class="tab center tab__to-me"
+        hover-class="tab__hover"
+        hover-start-time="0"
+        hover-stay-time="100"
+      >
+        <van-icon name="password-view" size="30px" />
+        <span class="tab__label">我见证的</span>
+      </div>
+    </div>
 
-    <!--<div class="usermotto">-->
-      <!--<div class="user-motto">-->
-        <!--<card :text="motto"></card>-->
-      <!--</div>-->
-    <!--</div>-->
-
-    <!--<form class="form-container">-->
-      <!--<input type="text" class="form-control" v-model="motto" placeholder="v-model" />-->
-      <!--<input type="text" class="form-control" v-model.lazy="motto" placeholder="v-model.lazy" />-->
-    <!--</form>-->
-    <!--<a href="/pages/counter/main" class="counter">去往Vuex示例页面</a>-->
+    <div class="add">
+      <div class="add__circle">
+        <span>+</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import card from '@/components/card'
-
 export default {
   data () {
     return {
-      motto: 'Hello World',
-      userInfo: {}
     }
-  },
-
-  components: {
-    card
   },
 
   methods: {
-    bindViewTap () {
-      const url = '../logs/main'
-      wx.navigateTo({ url })
-    },
-    getUserInfo () {
-      // 调用登录接口
-      // wx.login({
-      //   success: () => {
-      //     wx.getUserInfo({
-      //       success: (res) => {
-      //         this.userInfo = res.userInfo
-      //       }
-      //     })
-      //   }
-      // })
-    },
-    clickHandle (msg, ev) {
-      console.log('clickHandle:', msg, ev)
-    }
   },
 
   created () {
-    // 调用应用实例的方法获取全局数据
-    this.getUserInfo()
   }
 }
 </script>
 
-<style scoped>
-.userinfo {
+<style>
+.welcome {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  flex-direction: column;
+  color:#304261;
 }
-
-.userinfo-avatar {
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
+.welcome img {
+  width: 180rpx;
+  height: 180rpx;
   border-radius: 50%;
 }
-
-.userinfo-nickname {
-  color: #aaa;
+.tab__list {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  flex-direction: column;
 }
-
-.usermotto {
-  margin-top: 150px;
+.tab__list .tab {
+  width: 80%;
+  height: 200rpx;
+  border-radius: 10rpx;
+  color: #ffffff;
+  flex-direction: column;
 }
-
-.form-control {
-  display: block;
-  padding: 0 12px;
-  margin-bottom: 5px;
-  border: 1px solid #ccc;
+.tab__hover {
+  background-color: #dddddd !important;
 }
-
-.counter {
-  display: inline-block;
-  margin: 10px auto;
-  padding: 5px 10px;
-  color: blue;
-  border: 1px solid blue;
+.tab__from-me {
+  margin-bottom: 20rpx;
+  background-color: #CCCCCC;
+}
+.tab__to-me {
+  background-color: #FF6666;
+}
+.tab__label {
+}
+.add {
+  position: absolute;
+  bottom: 50rpx;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.add__circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  box-shadow:0rpx 0rpx 20rpx rgba(0, 0, 0, .2);
+  font-size: 0;
+  font-weight:200;
+  color:#999999;
+}
+.add__circle span {
+  font-size:80rpx;
+  height: 120rpx;
+  color:#304261;
 }
 </style>
