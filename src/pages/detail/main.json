@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "详情",
+  "usingComponents": {
+    "van-row": "/static/vant/row/index",
+    "van-col": "/static/vant/col/index",
+    "van-tag": "/static/vant/tag/index",
+    "van-button": "/static/vant/button/index",
+    "van-cell": "/static/vant/cell/index"
+  }
+}

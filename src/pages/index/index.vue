@@ -11,40 +11,124 @@
         hover-class="tab__hover"
         hover-start-time="0"
         hover-stay-time="100"
+        @click="toList(1)"
       >
         <van-icon name="edit-data" size="30px" />
-        <span class="tab__label">我创建的</span>
+        <span class="tab__label">我添加的</span>
+        <button
+          v-if="!userInfo"
+          open-type="getUserInfo"
+          @getuserinfo="val => getUserInfo(val, 1)"
+          plain
+        >
+        </button>
       </div>
       <div
         class="tab center tab__to-me"
         hover-class="tab__hover"
         hover-start-time="0"
         hover-stay-time="100"
+        @click="toList(2)"
       >
         <van-icon name="password-view" size="30px" />
         <span class="tab__label">我见证的</span>
+        <button
+          v-if="!userInfo"
+          open-type="getUserInfo"
+          @getuserinfo="val => getUserInfo(val, 2)"
+          plain
+        >
+        </button>
       </div>
     </div>
 
     <div class="add">
-      <div class="add__circle">
+      <div v-if="showAdd" class="add__out center">
+        <div
+          class="add__circle"
+          hover-class="tab__hover"
+          hover-start-time="0"
+          hover-stay-time="100"
+        >
+          添加承诺
+        </div>
+        <div
+          class="add__circle"
+          hover-class="tab__hover"
+          hover-start-time="0"
+          hover-stay-time="100"
+        >
+          添加时刻
+        </div>
+      </div>
+      <div
+        class="add__circle"
+        hover-class="tab__hover"
+        hover-start-time="0"
+        hover-stay-time="100"
+        @click="handleAdd()"
+      >
         <span>+</span>
       </div>
+      <button
+        v-if="!userInfo"
+        open-type="getUserInfo"
+        @getuserinfo="val => getUserInfo(val, 3)"
+        plain
+      >
+      </button>
     </div>
   </div>
 </template>
 
 <script>
+import store from '../../store'
+
 export default {
   data () {
     return {
+      showAdd: false
+    }
+  },
+
+  computed: {
+    userInfo () {
+      return store.state.userInfo
     }
   },
 
   methods: {
+    handleAdd () {
+      wx.navigateTo({
+        url: '/pages/create/main'
+      })
+    },
+
+    toList (type) {
+      wx.navigateTo({
+        url: `/pages/list/main?type=${type}`
+      })
+    },
+
+    getUserInfo (res, type) {
+      store.commit('setUser', res.mp.detail)
+      if (type === 3) {
+        this.handleAdd()
+      } else {
+        this.toList(type)
+      }
+    }
   },
 
-  created () {
+  onLaunch () {
+    wx.showShareMenu()
+  },
+
+  onShareAppMessage () {
+    return {
+      title: '见证承诺，见证时刻',
+      imageUrl: require('../../images/share.jpg')
+    }
   }
 }
 </script>
@@ -69,23 +153,27 @@ export default {
   flex-direction: column;
 }
 .tab__list .tab {
+  position: relative;
   width: 80%;
   height: 200rpx;
-  border-radius: 10rpx;
+  border-radius: 4rpx;
   color: #ffffff;
   flex-direction: column;
+  box-shadow:1rpx 2rpx 5rpx #cccccc;
 }
-.tab__hover {
-  background-color: #dddddd !important;
+.tab__list .tab button {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 .tab__from-me {
   margin-bottom: 20rpx;
-  background-color: #CCCCCC;
+  background-color: #aaa;
 }
 .tab__to-me {
-  background-color: #FF6666;
-}
-.tab__label {
+  /*background-color: #FF6666;*/
+  background-color: #304261;
 }
 .add {
   position: absolute;
@@ -94,20 +182,40 @@ export default {
   transform: translateX(-50%);
 }
 .add__circle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 140rpx;
   height: 140rpx;
   border-radius: 50%;
-  box-shadow:0rpx 0rpx 20rpx rgba(0, 0, 0, .2);
+  box-shadow: 0rpx 0rpx 20rpx rgba(0, 0, 0, .2);
   font-size: 0;
-  font-weight:200;
-  color:#999999;
+  font-weight: 200;
+  color: #999999;
+  text-align: center;
 }
 .add__circle span {
-  font-size:80rpx;
-  height: 120rpx;
-  color:#304261;
+  font-size: 80rpx;
+  color: #304261;
+  line-height:130rpx;
+  height:140rpx;
+}
+.add button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height:140rpx;
+  width:140rpx;
+  border-radius:50%;
+  border: none;
+}
+.add__out {
+  position: absolute;
+  top: -160rpx;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.add__out .add__circle {
+  font-size: 14px;
+}
+.add__out .add__circle:first-child {
+  margin-right: 30rpx;
 }
 </style>

@@ -3,22 +3,42 @@ function formatNumber (n) {
   return str[1] ? str : `0${str}`
 }
 
-export function formatTime (date) {
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
+function getNow () {
+  const t = new Date()
+  let y = t.getFullYear()
+  let m = t.getMonth() + 1
+  let h = t.getDate()
 
-  const hour = date.getHours()
-  const minute = date.getMinutes()
-  const second = date.getSeconds()
+  const res = {
+    year: y,
+    month: formatNumber(m),
+    date: formatNumber(h),
+    ts: t.getTime(),
+    full: ''
+  }
+  res.full = `${res.year}-${res.month}-${res.date}`
+  return res
+}
 
-  const t1 = [year, month, day].map(formatNumber).join('/')
-  const t2 = [hour, minute, second].map(formatNumber).join(':')
+function setWxBg () {
+  wx.setNavigationBarColor({
+    frontColor: '#000000',
+    backgroundColor: '#f2f2f2',
+    animation: 'linear'
+  })
+  wx.setBackgroundColor({
+    backgroundColor: '#f2f2f2'
+  })
+}
 
-  return `${t1} ${t2}`
+function setWxTitle (title) {
+  wx.setNavigationBarTitle({
+    title
+  })
 }
 
 export default {
-  formatNumber,
-  formatTime
+  getNow,
+  setWxBg,
+  setWxTitle
 }

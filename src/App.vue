@@ -1,23 +1,15 @@
 <script>
 export default {
-  created () {
-    // 调用API从本地缓存中获取数据
-    const logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
-
-    console.log('app created and cache logs by setStorageSync')
-  }
 }
 </script>
 
-<style>
-page {
-  height: 100%;
-}
-view {
-  box-sizing: border-box;
-}
+<style lang="stylus">
+@import './styles/common.styl'
+
+page
+  height: 100%
+view
+  box-sizing: border-box
 .container {
   height: 100%;
   display: flex;
@@ -25,18 +17,42 @@ view {
   align-items: center;
   justify-content: space-between;
 }
-.w-94 {
-  width: 94%;
-}
-.f-14 {
-  font-size: 14px;
-}
-.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.bg-ee {
-  background-color: #cccccc;
-}
+.seal
+  position absolute
+  top 260rpx
+  right 60rpx
+  width 200rpx
+  height 200rpx
+  z-index 1
+  transform rotate(-20deg)
+.w-94
+  width: 94%
+.f-14
+  font-size: 14px
+.f-18
+  font-size: 18px
+.t-c
+  text-align center
+.t-l
+  text-align left !important
+.center
+  display: flex
+  justify-content: center
+  align-items: center
+.p-10
+  padding px2rpx(10)
+.c-ff
+  color: #fff !important
+.c-99
+  color #999 !important
+.b-b
+  border-bottom 1rpx #f2f2f2 solid
+.bg-f2
+  background-color: #f2f2f2!important
+.bg-ee
+  background-color: #cccccc!important
+.bg-main
+  background-color: #304261 !important
+.tab__hover
+  background-color: #dddddd !important
 </style>

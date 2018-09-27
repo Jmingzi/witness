@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "添加承诺",
+  "usingComponents": {
+    "van-field": "/static/vant/field/index",
+    "van-button": "/static/vant/button/index",
+    "van-row": "/static/vant/row/index",
+    "van-col": "/static/vant/col/index",
+    "van-switch-cell": "/static/vant/switch-cell/index",
+    "van-cell": "/static/vant/cell/index"
+  }
+}
