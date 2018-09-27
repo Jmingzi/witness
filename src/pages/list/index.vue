@@ -76,8 +76,8 @@ export default {
   mounted () {
   },
 
-  onLoad (options) {
-    this.active = options.type - 1
+  onShow () {
+    this.active = this.$mp.query.type - 1
   },
 
   methods: {

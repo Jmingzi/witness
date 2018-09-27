@@ -23,7 +23,7 @@
               title-width="40px"
               placeholder="请输入"
               disabled
-              :value="userInfo.userInfo.nickName"
+              :value="userInfo.nickName"
             />
           </van-col>
           <van-col span="12">
@@ -90,7 +90,9 @@
 
 <script>
 import utils from '@/utils/index'
+import db from '@/db/index'
 import store from '../../store'
+import { WAIT_SIGN } from '../../constant'
 
 export default {
   components: {
@@ -133,19 +135,32 @@ export default {
         this.errorMsg = '请输入承诺内容'
         return false
       } else if (val.length < 10) {
-        this.errorMsg = '至少10个字，承诺这么少还不如不要...'
+        this.errorMsg = '至少10个字，承诺这么少有什么用呢...'
         return false
       }
       this.errorMsg = ''
-
       this.loading = true
-
-      setTimeout(() => {
+      const reqData = {
+        content: val,
+        from: {
+          name: this.userInfo.nickName,
+          iv: this.userInfo.iv,
+          avatar: this.userInfo.avatarUrl,
+          date: this.now.full
+        },
+        to: {
+        },
+        status: WAIT_SIGN,
+        fromUserId: '',
+        toUserId: '',
+        dataStatus: 1
+      }
+      db.insert(reqData).then(res => {
         this.loading = false
         wx.redirectTo({
-          url: '/pages/detail/main'
+          url: `/pages/detail/main?id=${res.id}`
         })
-      }, 1000)
+      })
     }
   }
 }

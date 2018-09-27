@@ -99,6 +99,7 @@ export default {
 
   methods: {
     handleAdd () {
+      console.log(this.userInfo)
       wx.navigateTo({
         url: '/pages/create/main'
       })
@@ -111,7 +112,7 @@ export default {
     },
 
     getUserInfo (res, type) {
-      store.commit('setUser', res.mp.detail)
+      store.commit('setUser', Object.assign(res.mp.detail, res.mp.detail.userInfo))
       if (type === 3) {
         this.handleAdd()
       } else {
@@ -120,7 +121,7 @@ export default {
     }
   },
 
-  onLaunch () {
+  onShow () {
     wx.showShareMenu()
   },
 

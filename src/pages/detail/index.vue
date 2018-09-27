@@ -85,6 +85,7 @@
 <script>
 import utils from '@/utils/index'
 // import store from './store'
+import db from '@/db/index'
 
 export default {
   computed: {
@@ -102,10 +103,12 @@ export default {
 
   onShow () {
     utils.setWxBg()
-  },
-
-  onLaunch () {
     wx.showShareMenu()
+    wx.showLoading({ title: '获取详情' })
+    db.getDetail(this.$mp.query.id).then(res => {
+      console.log(res)
+      wx.hideLoading()
+    })
   },
 
   onShareAppMessage () {

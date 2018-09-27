@@ -1,3 +1,5 @@
+export const WAIT_SIGN = 'waitSign'
+
 export const STATUS = {
   'waitSign': {
     text: '待签署',
@@ -26,5 +28,3 @@ export const STATUS = {
     text: '已兑现'
   }
 }
-
-export const a = 1
