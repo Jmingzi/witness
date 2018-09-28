@@ -11,10 +11,11 @@
         hover-class="tab__hover"
         hover-start-time="0"
         hover-stay-time="100"
-        @click="toList(1)"
       >
-        <van-icon name="edit-data" size="30px" />
-        <span class="tab__label">我承诺的</span>
+        <div @click="toList(1)" class="center tab__wrap">
+          <van-icon name="edit-data" size="30px" />
+          <span class="tab__label">我发起的承诺</span>
+        </div>
         <button
           v-if="!userInfo"
           open-type="getUserInfo"
@@ -28,10 +29,11 @@
         hover-class="tab__hover"
         hover-start-time="0"
         hover-stay-time="100"
-        @click="toList(2)"
       >
-        <van-icon name="password-view" size="30px" />
-        <span class="tab__label">我见证的</span>
+        <div @click="toList(2)" class="center tab__wrap">
+          <van-icon name="password-view" size="30px" />
+          <span class="tab__label">我签署的承诺</span>
+        </div>
         <button
           v-if="!userInfo"
           open-type="getUserInfo"
@@ -114,7 +116,6 @@ export default {
     },
 
     getUserInfo (res, type) {
-      // db.setUser()
       store.commit('setUser', Object.assign(res.mp.detail.userInfo))
       if (type === 3) {
         this.handleAdd()
@@ -125,7 +126,7 @@ export default {
   },
 
   onShow () {
-    utils.setStore(TAB_INDEX, 0)
+    utils.setStore(TAB_INDEX, undefined)
     wx.showShareMenu()
   },
 
@@ -177,8 +178,12 @@ export default {
   background-color: #aaa;
 }
 .tab__to-me {
-  /*background-color: #FF6666;*/
   background-color: #304261;
+}
+.tab__wrap {
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
 }
 .add {
   position: absolute;

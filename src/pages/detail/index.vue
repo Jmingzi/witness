@@ -54,10 +54,10 @@
           <van-col span="24">
             <div class="my-cell b-b" v-if="isComplete">
               <span>兑现日期</span>
-              <span class="c-99 my-cell__value">{{ content.updatedAt }}</span>
+              <span class="c-99 my-cell__value">{{ content.updatedDate }}</span>
             </div>
             <div class="my-cell b-b" v-else>
-              <span>截止兑现日期</span>
+              <span>兑现截止日期</span>
               <span class="c-99 my-cell__value">{{ content.exchangeDate }}</span>
             </div>
           </van-col>
@@ -83,7 +83,7 @@
       </p>
 
       <template v-if="status.btnText || status.btnTextSelf">
-        <div v-if="isWaitSign && !isOther" class="my-button">
+        <div v-if="isWaitSign" class="my-button">
           <van-button
             size="large"
             :loading="loading"
@@ -182,13 +182,21 @@
       </template>
 
       <van-button
-        v-if="!isOther && (isSign || isComplete) || isOther"
+        v-if="!isOther && (isSign || isComplete) || isOther && !isWaitSign"
         size="large"
-        :loading="loading"
         custom-class="bg-main detail__btn c-ff"
         @click="toIndex"
       >
-        {{ isOther ? '创建我的承诺书' : status.btnText }}
+        {{ isOther ? '向Ta发起承诺' : status.btnText }}
+      </van-button>
+
+      <van-button
+        v-if="isShowRefresh"
+        size="large"
+        custom-class="bg-ee detail__btn c-ff m-t10"
+        @click="getDetail"
+      >
+        刷新状态
       </van-button>
     </div>
 
@@ -244,7 +252,7 @@ export default {
     },
 
     isTarget () {
-      // return false
+      // return true
       return this.content && store.state.auth
         ? store.state.auth.openid === this.content.toUserId
         : false
@@ -287,6 +295,11 @@ export default {
           .replace('a', this.content.from.name)
           .replace('b', this.content.to.name)
         : ''
+    },
+
+    isShowRefresh () {
+      return (this.isSelf && (this.isWaitSign || this.isWaitComplete)) ||
+        (this.isTarget && (this.isWaitSignConfirm || this.isWaitCompleteConfirm))
     }
   },
 
@@ -302,14 +315,16 @@ export default {
   onShareAppMessage () {
     const name = this.content.from.name
     return {
-      title: `${name}发来一封承诺书，请注意查收～`
+      title: `${name}希望你答应Ta以下内容，请注意查收～`
     }
   },
 
   methods: {
     getDetail () {
       db.getDetail(this.$mp.query.id).then(res => {
-        this.content = res.toJSON()
+        const data = res.toJSON()
+        data.updatedDate = utils.format(data.updatedAt)
+        this.content = data
         detailBak = res
         wx.hideLoading()
       })
@@ -335,7 +350,8 @@ export default {
           avatar: this.userInfo.avatarUrl,
           date: utils.getNow().full
         },
-        toUserId: store.state.auth.openid
+        // 只需要更改一次
+        toUserId: this.isWaitSign ? store.state.auth.openid : this.content.toUserId
       }).save().then(() => {
         this.loading = false
         this.getDetail()

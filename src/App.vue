@@ -3,7 +3,7 @@ import db from './db'
 import store from './store'
 
 export default {
-  onLaunch () {
+  onShow () {
     db.login().then(user => {
       console.log(user)
       store.commit('setAuth', user)

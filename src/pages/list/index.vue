@@ -2,8 +2,8 @@
   <div class="container bg-f2">
     <div class="list__tab">
       <van-tabs :active="active" @change="changeTab">
-        <van-tab title="我承诺的"></van-tab>
-        <van-tab title="我见证的"></van-tab>
+        <van-tab title="我发起的"></van-tab>
+        <van-tab title="我签署的"></van-tab>
       </van-tabs>
     </div>
 
@@ -24,7 +24,7 @@
           @click="toDetail(item)"
         >
           <div class="img">
-            <img :src="item.to.avatar ? item.to.avatar : '../../images/logo.jpg'">
+            <img :src="item.avatarUrl">
           </div>
           <div class="list__item-right">
             <div class="list__item-info">
@@ -48,7 +48,7 @@
           custom-class="empty__add"
           @click="toCreate"
         >
-          立即添加承诺
+          回到首页
         </van-button>
       </div>
     </div>
@@ -89,45 +89,48 @@ export default {
   },
 
   watch: {
-    auth () {
-      console.log('has auth, get list')
-      this.getList()
-    }
+    // auth () {
+    // this.getList()
+    // }
   },
 
   onShow () {
     this.active = this.$mp.query.type - 1
     utils.getStore(TAB_INDEX).then(res => {
-      if (res) {
+      if (res !== undefined) {
         this.active = res
-
-        if (this.auth) {
-          console.log('has auth, get list')
-          this.getList()
-        }
       }
+      this.getList()
     })
   },
 
   methods: {
+    // getAvatar (item) {
+    //   const field = this.active === 0 ? 'to' : 'from'
+    //   return item[field].avatar ? item[field].avatar : '../../images/logo.jpg'
+    // },
     toCreate () {
       wx.redirectTo({
-        url: '/pages/create/main'
+        url: '/pages/index/main'
       })
     },
 
     getList () {
       this.hasLoad = true
+      this.list = []
+      console.log('has auth, get list')
       wx.showLoading({ title: '获取列表' })
       const field = this.active === 0 ? 'fromUserId' : 'toUserId'
       db.getList(this.currentPage, { [field]: store.state.auth.openid }).then(res => {
         wx.hideLoading()
         this.list = res.map(x => {
           const item = x.toJSON()
+          const field = this.active === 0 ? 'to' : 'from'
           return {
             ...item,
             updatedAt: utils.format(item.updatedAt),
-            statusObj: STATUS[item.status]
+            statusObj: STATUS[item.status],
+            avatarUrl: item[field].avatar ? item[field].avatar : '../../images/logo.jpg'
           }
         })
       })

@@ -6,7 +6,7 @@
         <img src="../../images/yz.gif" class="seal">
         <van-field
           type="textarea"
-          placeholder="我向月亮发誓..."
+          placeholder="我要你向月亮发誓，答应我..."
           :border="false"
           :focus="true"
           :error-message="errorMsg"
@@ -119,6 +119,7 @@ export default {
   },
 
   onShow () {
+    this.textContent = ''
     utils.setWxBg()
   },
 
