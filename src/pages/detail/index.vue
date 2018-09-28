@@ -345,13 +345,13 @@ export default {
       this.loading = true
       // 响应式数据循环更新
       Object.assign(detailBak, { status }, {
-        to: {
+        to: Object.keys(this.content.to).length > 0 ? this.content.to : {
           name: this.userInfo.nickName,
           avatar: this.userInfo.avatarUrl,
           date: utils.getNow().full
         },
         // 只需要更改一次
-        toUserId: this.isWaitSign ? store.state.auth.openid : this.content.toUserId
+        toUserId: this.content.toUserId ? this.content.toUserId : store.state.auth.openid
       }).save().then(() => {
         this.loading = false
         this.getDetail()
