@@ -14,7 +14,7 @@
         @click="toList(1)"
       >
         <van-icon name="edit-data" size="30px" />
-        <span class="tab__label">我添加的</span>
+        <span class="tab__label">我承诺的</span>
         <button
           v-if="!userInfo"
           open-type="getUserInfo"
@@ -83,6 +83,8 @@
 
 <script>
 import store from '../../store'
+import { TAB_INDEX } from '@/constant/index'
+import utils from '@/utils/index'
 
 export default {
   data () {
@@ -112,7 +114,8 @@ export default {
     },
 
     getUserInfo (res, type) {
-      store.commit('setUser', Object.assign(res.mp.detail, res.mp.detail.userInfo))
+      // db.setUser()
+      store.commit('setUser', Object.assign(res.mp.detail.userInfo))
       if (type === 3) {
         this.handleAdd()
       } else {
@@ -122,6 +125,7 @@ export default {
   },
 
   onShow () {
+    utils.setStore(TAB_INDEX, 0)
     wx.showShareMenu()
   },
 

@@ -1,8 +1,8 @@
 <template>
   <div class="container bg-f2">
     <div class="list__tab">
-      <van-tabs :active="active">
-        <van-tab title="我添加的"></van-tab>
+      <van-tabs :active="active" @change="changeTab">
+        <van-tab title="我承诺的"></van-tab>
         <van-tab title="我见证的"></van-tab>
       </van-tabs>
     </div>
@@ -15,8 +15,8 @@
         @scrolltolower="toBottom"
       >
         <div
-          v-for="(item, i) in list"
-          :key="i"
+          v-for="item in list"
+          :key="item.objectId"
           class="list__item f-14"
           hover-class="tab__hover"
           hover-start-time="0"
@@ -24,14 +24,17 @@
           @click="toDetail(item)"
         >
           <div class="img">
-            <img src="../../images/logo.jpg">
+            <img :src="item.to.avatar ? item.to.avatar : '../../images/logo.jpg'">
           </div>
           <div class="list__item-right">
             <div class="list__item-info">
-              <span>2018-08-08</span>
-              <van-tag>已兑现</van-tag>
+              <div class="center">
+                <van-icon class="list__item-icon" name="clock"></van-icon>
+                <span>{{ item.updatedAt }}</span>
+              </div>
+              <van-tag :type="item.statusObj.style">{{ item.statusObj.text }}</van-tag>
             </div>
-            <p>内容很长内容很长内容很长内容很长内容很长内容很长内容很长内容很长</p>
+            <p class="list__item-word">{{ item.content }}</p>
           </div>
         </div>
       </scroll-view>
@@ -45,7 +48,7 @@
           custom-class="empty__add"
           @click="toCreate"
         >
-          立即添加
+          立即添加承诺
         </van-button>
       </div>
     </div>
@@ -53,8 +56,10 @@
 </template>
 
 <script>
-// import { formatTime } from '@/utils/index'
-// import card from '@/components/card'
+import db from '@/db/index'
+import utils from '@/utils/index'
+import store from '@/store/index'
+import { STATUS, TAB_INDEX } from '@/constant/index'
 
 export default {
   components: {
@@ -63,21 +68,45 @@ export default {
   data () {
     return {
       active: 0,
-      list: [1, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+      list: [],
+      currentPage: 1,
+
+      hasLoad: false
     }
   },
 
   computed: {
     query () {
       return this.$root.$mp.query
+    },
+
+    auth () {
+      return store.state.auth
     }
   },
 
   mounted () {
   },
 
+  watch: {
+    auth () {
+      console.log('has auth, get list')
+      this.getList()
+    }
+  },
+
   onShow () {
     this.active = this.$mp.query.type - 1
+    utils.getStore(TAB_INDEX).then(res => {
+      if (res) {
+        this.active = res
+
+        if (this.auth) {
+          console.log('has auth, get list')
+          this.getList()
+        }
+      }
+    })
   },
 
   methods: {
@@ -87,13 +116,36 @@ export default {
       })
     },
 
+    getList () {
+      this.hasLoad = true
+      wx.showLoading({ title: '获取列表' })
+      const field = this.active === 0 ? 'fromUserId' : 'toUserId'
+      db.getList(this.currentPage, { [field]: store.state.auth.openid }).then(res => {
+        wx.hideLoading()
+        this.list = res.map(x => {
+          const item = x.toJSON()
+          return {
+            ...item,
+            updatedAt: utils.format(item.updatedAt),
+            statusObj: STATUS[item.status]
+          }
+        })
+      })
+    },
+
+    changeTab (e) {
+      this.active = e.mp.detail.index
+      utils.setStore(TAB_INDEX, this.active)
+      this.getList()
+    },
+
     toBottom () {
       console.log(1)
     },
 
     toDetail (item) {
       wx.navigateTo({
-        url: `/pages/detail/main?id=1`
+        url: `/pages/detail/main?id=${item.objectId}`
       })
     }
   }
@@ -125,7 +177,8 @@ export default {
   padding: 20rpx;
 }
 .list__item .img {
-  width: 250rpx;
+  /*width: 250rpx;*/
+  width: 140rpx;
   height: 140rpx;
   border-radius: 4rpx;
   overflow: hidden;
@@ -135,11 +188,25 @@ export default {
   width: 100%;
   height: 100%;
 }
+.list__item-right {
+  width: 255px;
+}
+.list__item-icon {
+  margin-right: 5px
+  margin-bottom: -4px
+}
+.list__item-word
+  word-break break-all
+  display:-webkit-box;
+  overflow:hidden;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical
+
 .list__item-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20rpx;
+  margin-bottom: 5px;
   font-size: 12px;
   color: #999999;
 }

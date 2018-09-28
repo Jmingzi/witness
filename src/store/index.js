@@ -7,11 +7,16 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    userInfo: null
+    userInfo: null,
+    auth: null
   },
   mutations: {
-    setUser: (state, payload) => {
+    setUser (state, payload) {
       state.userInfo = payload
+    },
+
+    setAuth (state, payload) {
+      state.auth = payload
     }
   }
 })

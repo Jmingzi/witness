@@ -46,10 +46,10 @@
 					"query": "type=1"
 				},
 				{
-					"id": -1,
+					"id": 2,
 					"name": "详情",
 					"pathName": "pages/detail/main",
-					"query": "id=1"
+					"query": "id=5bae03d70b6160006fc67f1a"
 				}
 			]
 		}

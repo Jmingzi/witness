@@ -12,7 +12,7 @@
           :error-message="errorMsg"
           :value="textContent"
           @change="e => textContent = e.mp.detail"
-          maxlength="120"
+          maxlength="200"
           border
         />
 
@@ -112,6 +112,9 @@ export default {
   computed: {
     userInfo () {
       return store.state.userInfo
+    },
+    auth () {
+      return store.state.auth
     }
   },
 
@@ -134,7 +137,7 @@ export default {
       if (!val) {
         this.errorMsg = '请输入承诺内容'
         return false
-      } else if (val.length < 10) {
+      } else if (val.length < 5) {
         this.errorMsg = '至少10个字，承诺这么少有什么用呢...'
         return false
       }
@@ -144,22 +147,22 @@ export default {
         content: val,
         from: {
           name: this.userInfo.nickName,
-          iv: this.userInfo.iv,
           avatar: this.userInfo.avatarUrl,
           date: this.now.full
         },
         to: {
         },
         status: WAIT_SIGN,
-        fromUserId: '',
+        fromUserId: this.auth.openid,
         toUserId: '',
-        dataStatus: 1
+        dataStatus: 1,
+        imgUrl: '',
+        needExchange: this.needExchange,
+        exchangeDate: this.exchangeDate
       }
-      db.insert(reqData).then(res => {
+      db.insert(reqData).then(id => {
         this.loading = false
-        wx.redirectTo({
-          url: `/pages/detail/main?id=${res.id}`
-        })
+        wx.redirectTo({ url: `/pages/detail/main?id=${id}` })
       })
     }
   }

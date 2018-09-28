@@ -1,5 +1,14 @@
 <script>
+import db from './db'
+import store from './store'
+
 export default {
+  onLaunch () {
+    db.login().then(user => {
+      console.log(user)
+      store.commit('setAuth', user)
+    })
+  }
 }
 </script>
 
@@ -41,6 +50,8 @@ view
   align-items: center
 .p-10
   padding px2rpx(10)
+.m-t10
+  margin-top 10px
 .c-ff
   color: #fff !important
 .c-99

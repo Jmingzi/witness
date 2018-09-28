@@ -3,8 +3,8 @@ function formatNumber (n) {
   return str[1] ? str : `0${str}`
 }
 
-function getNow () {
-  const t = new Date()
+function getNow (time) {
+  const t = time ? new Date(time) : new Date()
   let y = t.getFullYear()
   let m = t.getMonth() + 1
   let h = t.getDate()
@@ -37,8 +37,30 @@ function setWxTitle (title) {
   })
 }
 
+function format (time) {
+  return getNow(time).full
+}
+
+function getStore (key) {
+  return new Promise(resolve => {
+    wx.getStorage({
+      key,
+      success (r) {
+        resolve(r.data)
+      }
+    })
+  })
+}
+
+function setStore (key, val) {
+  wx.setStorage({ key, data: val })
+}
+
 export default {
   getNow,
   setWxBg,
-  setWxTitle
+  setWxTitle,
+  format,
+  getStore,
+  setStore
 }
