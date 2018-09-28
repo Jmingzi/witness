@@ -20,15 +20,19 @@ function getNow (time) {
   return res
 }
 
+function setWxBgBody () {
+  wx.setBackgroundColor({
+    backgroundColor: '#f2f2f2'
+  })
+}
+
 function setWxBg () {
   wx.setNavigationBarColor({
     frontColor: '#000000',
     backgroundColor: '#f2f2f2',
     animation: 'linear'
   })
-  wx.setBackgroundColor({
-    backgroundColor: '#f2f2f2'
-  })
+  setWxBgBody()
 }
 
 function setWxTitle (title) {
@@ -62,5 +66,6 @@ export default {
   setWxTitle,
   format,
   getStore,
-  setStore
+  setStore,
+  setWxBgBody
 }

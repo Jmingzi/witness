@@ -95,6 +95,7 @@ export default {
   },
 
   onShow () {
+    utils.setWxBgBody()
     this.active = this.$mp.query.type - 1
     utils.getStore(TAB_INDEX).then(res => {
       if (res !== undefined) {
