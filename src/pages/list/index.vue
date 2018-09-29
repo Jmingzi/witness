@@ -111,8 +111,11 @@ export default {
     //   return item[field].avatar ? item[field].avatar : '../../images/logo.jpg'
     // },
     toCreate () {
-      wx.redirectTo({
-        url: '/pages/index/main'
+      // wx.redirectTo({
+      //   url: '/pages/index/main'
+      // })
+      wx.navigateBack({
+        delta: 1
       })
     },
 
