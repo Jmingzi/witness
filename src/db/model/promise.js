@@ -15,4 +15,7 @@ export default class Witness extends AV.Object {
 
   get to () { return this.get('to') }
   set to (value) { this.set('to', value) }
+
+  get from () { return this.get('from') }
+  set from (value) { this.set('from', value) }
 }

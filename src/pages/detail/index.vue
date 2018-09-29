@@ -6,7 +6,19 @@
       <div class="detail__line"></div>
 
       <p class="f-18 t-c">承诺书</p>
-      <p class="detail__content-a">{{ content && content.content }}</p>
+      <p class="detail__content-a">
+        <span class="c-99">甲方</span>
+        <span class="detail__from">
+          {{ content && content.from.name ? content && content.from.name : '' }}
+        </span>
+        要
+        <span class="c-99">乙方</span>
+        <span class="detail__to">
+          {{ content && content.to.name ? content && content.to.name : '' }}
+        </span>
+        承诺以下内容：
+        {{ content && content.content }}
+      </p>
 
       <van-row>
         <van-col span="12">
@@ -403,6 +415,8 @@ export default {
     &-a
       text-indent 2em
       margin px2rpx(20) 0
+      word-break break-all
+      line-height 25px
   &__notice
     margin 10px 20px 20px 20px
   &__logo
@@ -419,6 +433,12 @@ export default {
     height 90px
     border-bottom 1rpx #304261 dashed
     transform rotate(-45deg)
+  &__from,
+  &__to {
+    padding 0 15px
+    border-bottom 1rpx #666 solid
+    margin 0 5px
+  }
 
 .my-cell
   display flex
