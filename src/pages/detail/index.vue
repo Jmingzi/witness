@@ -7,12 +7,13 @@
 
       <p class="f-18 t-c">承诺书</p>
       <p class="detail__content-a">
-        <span class="c-99">甲方</span>
+        <span>甲方</span>
         <span class="detail__from">
           {{ content && content.from.name ? content && content.from.name : '' }}
+          <span class="c-99">{{ isSelf ? '(我)' : '' }}</span>
         </span>
         要
-        <span class="c-99">乙方</span>
+        <span>乙方</span>
         <span class="detail__to">
           {{ content && content.to.name ? content && content.to.name : '' }}
         </span>
