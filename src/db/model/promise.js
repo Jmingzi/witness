@@ -1,6 +1,6 @@
 import AV from 'leancloud-storage'
 
-export default class Witness extends AV.Object {
+class Witness extends AV.Object {
   get dataStatus () { return this.get('dataStatus') }
   set dataStatus (value) { this.set('dataStatus', value) }
 
@@ -19,3 +19,6 @@ export default class Witness extends AV.Object {
   get from () { return this.get('from') }
   set from (value) { this.set('from', value) }
 }
+
+AV.Object.register(Witness, 'Witness')
+export default Witness
