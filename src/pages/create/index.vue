@@ -226,7 +226,7 @@ export default {
 
 .fromUser,
 .toUser {
-  padding 0 15px
+  padding 0 10px
   border-bottom 1rpx #666 solid
   margin 0 5px
 }

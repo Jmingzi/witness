@@ -435,7 +435,7 @@ export default {
     transform rotate(-45deg)
   &__from,
   &__to {
-    padding 0 15px
+    padding 0 10px
     border-bottom 1rpx #666 solid
     margin 0 5px
   }
