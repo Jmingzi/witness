@@ -54,7 +54,7 @@ const sendTemplateMessage = (reqUrl) => {
 
 const server = http.createServer((req, res) => {
   console.log(req.url)
-  if (req.url === '/getAccessToken') {
+  if (/getAccessToken/.test(req.url)) {
     getAccessToken().then(token => {
       res.writeHead(200)
       res.end(JSON.stringify({ token }))
@@ -62,7 +62,7 @@ const server = http.createServer((req, res) => {
       res.writeHead(200)
       res.end(JSON.stringify({ ...res.data }))
     })
-  } else if (/^\/sendTemplateMessage/.test(req.url)) {
+  } else if (/\/sendTemplateMessage/.test(req.url)) {
     sendTemplateMessage(req.url).then(data => {
       res.writeHead(200)
       res.end(JSON.stringify(data))
