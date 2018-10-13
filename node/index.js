@@ -50,7 +50,7 @@ const sendTemplateMessage = (reqUrl) => {
     touser: 'okbFo5JofpMsNWsD156pnLpo5yXc',
     template_id: templateId,
     form_id: params.formId
-  }))
+  })
 
   return axios.post(url, {
     access_token: accessToken || token,
