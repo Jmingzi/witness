@@ -38,7 +38,7 @@ const addTemplate = () => {
 }
 
 const sendTemplateMessage = (reqUrl) => {
-  const url = `https://api.weixin.qq.com/cgi-bin/message/wxopen/template/uniform_send`
+  const url = `https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send`
   const templateId = 'keRZcuEsnmNUVh6I2qd9isd2MOLM7LHAmry0RwURZ9k'
 
   const search = reqUrl.substring(reqUrl.indexOf('?') + 1)

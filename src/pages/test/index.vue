@@ -19,8 +19,8 @@ export default {
     getToken (e) {
       this.formId = e.mp.detail.formId
       wx.request({
-        url: 'https://iming.work:3001/getAccessToken',
-        success () {
+        url: 'https://iming.work/api/getAccessToken',
+        success: () => {
           this.templateSend(this.formId)
         }
       })
@@ -28,7 +28,7 @@ export default {
 
     templateSend (formId) {
       wx.request({
-        url: 'https://iming.work:3001/sendTemplateMessage',
+        url: 'https://iming.work/api/sendTemplateMessage',
         data: {
           formId,
           openId: 'okbFo5JofpMsNWsD156pnLpo5yXc'
