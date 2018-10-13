@@ -44,6 +44,14 @@ const sendTemplateMessage = (reqUrl) => {
   const search = reqUrl.substring(reqUrl.indexOf('?') + 1)
   const params = querystring.parse(search)
 
+  console.log(url)
+  console.log({
+    access_token: accessToken || token,
+    touser: 'okbFo5JofpMsNWsD156pnLpo5yXc',
+    template_id: templateId,
+    form_id: params.formId
+  }))
+
   return axios.post(url, {
     access_token: accessToken || token,
     touser: 'okbFo5JofpMsNWsD156pnLpo5yXc',
