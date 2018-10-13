@@ -3,7 +3,8 @@
     "pages/index/main",
     "pages/create/main",
     "pages/detail/main",
-    "pages/list/main"
+    "pages/list/main",
+    "pages/test/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
