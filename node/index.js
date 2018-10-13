@@ -56,7 +56,12 @@ const sendTemplateMessage = (reqUrl) => {
     access_token: accessToken || token,
     touser: 'okbFo5JofpMsNWsD156pnLpo5yXc',
     template_id: templateId,
-    form_id: params.formId
+    form_id: params.formId,
+    data: {
+      keyword1: {
+        value: 339208499
+      }
+    }
   })
 }
 
