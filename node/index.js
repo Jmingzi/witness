@@ -58,7 +58,7 @@ const sendTemplateMessage = (reqUrl) => {
     touser: params.openId,
     template_id: params.templateId || templateId,
     form_id: params.formId,
-    page: decodeURIComponent(params.page),
+    // page: params.page,
     data: {
       keyword1: {
         value: params.value1
