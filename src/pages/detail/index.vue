@@ -115,7 +115,7 @@
             plain
             class="my-button__btn"
             form-type="submit"
-            :open-type="userInfo ? '' : 'getUserInfo'"
+            open-type="getUserInfo"
             @click="beforeHandle('handleWaitSign')"
             @getuserinfo="getUserInfo"
           >
@@ -131,7 +131,7 @@
               plain
               class="my-button__btn"
               form-type="submit"
-              :open-type="userInfo ? '' : 'getUserInfo'"
+              open-type="getUserInfo"
               @click="beforeHandle('handleWaitSignConfirm', true)"
               @getuserinfo="getUserInfo"
             >
@@ -145,7 +145,7 @@
               plain
               class="my-button__btn"
               form-type="submit"
-              :open-type="userInfo ? '' : 'getUserInfo'"
+              open-type="getUserInfo"
               @click="beforeHandle('handleWaitSignConfirm', false)"
               @getuserinfo="getUserInfo"
             >
@@ -161,7 +161,7 @@
             plain
             class="my-button__btn"
             form-type="submit"
-            :open-type="userInfo ? '' : 'getUserInfo'"
+            open-type="getUserInfo"
             @click="beforeHandle('handleCompleteConfirm')"
             @getuserinfo="getUserInfo"
           >
@@ -176,7 +176,7 @@
             plain
             class="my-button__btn"
             form-type="submit"
-            :open-type="userInfo ? '' : 'getUserInfo'"
+            open-type="getUserInfo"
             @click="beforeHandle('handleComplete')"
             @getuserinfo="getUserInfo"
           >
@@ -356,18 +356,18 @@ export default {
       }
     },
 
-    getUserInfo (res, fn, params) {
+    getUserInfo (res) {
       wx.showToast({ title: 'getUserInfo' })
       store.commit('setUser', Object.assign(res.mp.detail.userInfo))
-      fn && this[fn](params)
+      // fn && this[fn](params)
     },
 
     getFormIdAndToken (e) {
-      this.formId = e.mp.detail.formId
       wx.request({
         url: 'https://iming.work/api/getAccessToken',
         success: () => {
           // this.templateSend(this.formId)
+          this.formId = e.mp.detail.formId
           console.log('已获取token并记录formId')
         }
       })

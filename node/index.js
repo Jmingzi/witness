@@ -91,7 +91,7 @@ const server = http.createServer((req, res) => {
       res.end(JSON.stringify(data))
     }).catch(data => {
       res.writeHead(200)
-      console.log('发送消息失败', data.data)
+      console.log('发送消息catch', data)
       res.end(JSON.stringify(data))
     })
   } else if (req.url === '/addTemplate') {
