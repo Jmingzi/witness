@@ -110,8 +110,7 @@
             class="my-button__btn"
             form-type="submit"
             :open-type="isSelf ? 'share' : 'getUserInfo'"
-            @click="beforeHandle('handleWaitSign')"
-            @getuserinfo="getUserInfo"
+            @getuserinfo="e => getUserInfo(e, 'handleWaitSign')"
           >
           </button>
         </div>
@@ -126,8 +125,7 @@
               class="my-button__btn"
               form-type="submit"
               open-type="getUserInfo"
-              @click="beforeHandle('handleWaitSignConfirm', true)"
-              @getuserinfo="getUserInfo"
+              @getuserinfo="e => getUserInfo(e, 'handleWaitSignConfirm', true)"
             >
             </button>
           </div>
@@ -140,8 +138,7 @@
               class="my-button__btn"
               form-type="submit"
               open-type="getUserInfo"
-              @click="beforeHandle('handleWaitSignConfirm', false)"
-              @getuserinfo="getUserInfo"
+              @getuserinfo="e => getUserInfo(e, 'handleWaitSignConfirm', false)"
             >
             </button>
           </div>
@@ -156,8 +153,7 @@
             class="my-button__btn"
             form-type="submit"
             open-type="getUserInfo"
-            @click="beforeHandle('handleCompleteConfirm')"
-            @getuserinfo="getUserInfo"
+            @getuserinfo="e => getUserInfo(e, 'handleCompleteConfirm')"
           >
           </button>
         </div>
@@ -171,8 +167,7 @@
             class="my-button__btn"
             form-type="submit"
             open-type="getUserInfo"
-            @click="beforeHandle('handleComplete')"
-            @getuserinfo="val => getUserInfo(val, 'handleComplete')"
+            @getuserinfo="e => getUserInfo(e, 'handleComplete')"
           >
           </button>
         </div>
@@ -197,7 +192,7 @@
       </van-button>
     </div>
 
-    <div class="t-l" v-if="true">
+    <div class="t-l" v-if="false">
       <p>isSelf: {{ isSelf }}</p>
       <p>isTarget: {{ isTarget }}</p>
       <p>isOther: {{ isOther }}</p>
@@ -320,6 +315,7 @@ export default {
 
   onHide () {
     this.timer && clearInterval(this.timer)
+    this.timer = null
     console.log('clear timer.')
   },
 
@@ -352,6 +348,7 @@ export default {
         this.timer = setInterval(() => {
           if (this.userInfo && this.formId) {
             clearInterval(this.timer)
+            this.timer = null
             console.log('timer is stopped')
 
             if (this.isSelf) {
@@ -371,9 +368,10 @@ export default {
       }
     },
 
-    getUserInfo (res) {
+    getUserInfo (res, fn, params) {
       store.commit('setUser', Object.assign(res.mp.detail.userInfo))
-      wx.showToast({ title: 'getUserInfo' })
+      // wx.showToast({ title: 'getUserInfo' })
+      this.beforeHandle(fn, params)
     },
 
     getFormIdAndToken (e) {
@@ -382,11 +380,11 @@ export default {
         success: () => {
           this.formId = e.mp.detail.formId
           console.log('已获取token并记录formId')
-          // if (this.isWaitSign) {
-          // 只对这种情况处理，其余情况在button上绑定处理
-          // 因为在分享时，不会触发button的点击事件
-          // this.saveFromUserFormId()
-          // }
+          if (this.isWaitSign) {
+            // 只对这种情况处理，其余情况在button上绑定处理
+            // 因为在分享时，不会触发button的点击事件
+            this.saveFromUserFormId()
+          }
         }
       })
     },
@@ -398,24 +396,36 @@ export default {
           formId: this.formId
         }
       }).save().then(() => {
-        wx.showToast({ title: '更新from.fromFormId成功' })
+        wx.showToast({ title: '操作成功' })
       })
     },
 
     handleCommon (status, opt) {
       this.loading = true
       // 响应式数据循环更新
-      return Object.assign(detailBak, {
+      let reqData = {
         status,
         to: Object.keys(this.content.to).length > 0 ? this.content.to : {
           name: this.userInfo.nickName,
           avatar: this.userInfo.avatarUrl,
           date: utils.getNow().full
         },
-        ...opt,
         // 只需要更改一次
         toUserId: this.content.toUserId ? this.content.toUserId : store.state.auth.openid
-      }).save().then(() => {
+      }
+      reqData = Object.assign(detailBak, reqData)
+      if (opt.to) {
+        reqData.to = {
+          ...reqData.to,
+          ...opt.to
+        }
+      } else if (opt.from) {
+        reqData.from = {
+          ...reqData.from,
+          ...opt.from
+        }
+      }
+      return reqData.save().then(() => {
         this.loading = false
         this.getDetail()
         return ''
@@ -425,7 +435,7 @@ export default {
     handleWaitSign () {
       this.handleCommon(WAIT_SIGN_CONFIRM, { to: { formId: this.formId } }).then(() => {
         this.sendMessage({
-          message: `您的承诺书已被${this.userInfo.nickName}签署，等待您确认~`,
+          message: `您的承诺书已被乙方（${this.userInfo.nickName}）签署，等待您确认~`,
           status: STATUS[WAIT_SIGN_CONFIRM].text,
           openId: this.content.fromUserId,
           formId: this.content.from.formId
@@ -440,10 +450,10 @@ export default {
 
       if (isTarget) {
         status = needExchange ? WAIT_COMPLETE : SIGN
-        message = `您签署的承诺书已被甲方${from.name}确认${needExchange ? '，等待您兑现承诺～' : ''}`
+        message = `您签署的承诺书已被甲方（${from.name}）确认${needExchange ? '，等待您兑现承诺～' : ''}`
       } else {
         status = WAIT_SIGN
-        message = `甲方${from.name}驳回了您的签署，您不是乙方～`
+        message = `甲方（${from.name}）驳回了您的签署，您不是乙方～`
       }
 
       this.handleCommon(status, { from: { formId: this.formId } }).then(() => {
@@ -459,7 +469,7 @@ export default {
     handleCompleteConfirm () {
       this.handleCommon(WAIT_COMPLETE_CONFIRM, { to: { formId: this.formId } }).then(() => {
         this.sendMessage({
-          message: `承诺已被${this.content.to.name}兑现，请确认是否已兑现～`,
+          message: `承诺已被乙方（${this.content.to.name}）兑现，请确认是否已兑现～`,
           status: STATUS[WAIT_COMPLETE_CONFIRM].text,
           openId: this.content.fromUserId,
           formId: this.content.from.formId
@@ -470,7 +480,7 @@ export default {
     handleComplete () {
       this.handleCommon(COMPLETE, { from: { formId: this.formId } }).then(() => {
         this.sendMessage({
-          message: `甲方${this.content.from.name}已确认您兑现了承诺`,
+          message: `甲方（${this.content.from.name}）已确认您兑现了承诺`,
           status: STATUS[COMPLETE].text,
           openId: this.content.toUserId,
           formId: this.content.to.formId

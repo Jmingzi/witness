@@ -162,6 +162,10 @@ export default {
     utils.setWxBg()
   },
 
+  onHide () {
+    this.loading = false
+  },
+
   methods: {
     onChange (event) {
       // 需要手动对 checked 状态进行更新
