@@ -357,6 +357,7 @@ export default {
     },
 
     getUserInfo (res, fn, params) {
+      wx.showToast({ title: 'getUserInfo' })
       store.commit('setUser', Object.assign(res.mp.detail.userInfo))
       fn && this[fn](params)
     },
