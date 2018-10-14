@@ -101,21 +101,15 @@
         @submit="getFormIdAndToken"
       >
         <div v-if="isWaitSign" class="my-button">
-          <!--van-button只用对本人时做分享-->
-          <van-button
-            size="large"
-            custom-class="bg-main detail__btn c-ff"
-            open-type="share"
-          >
+          <!--van-button只做展示用-->
+          <van-button size="large" custom-class="bg-main detail__btn c-ff">
             {{ isSelf ? status.btnTextSelf : status.btnText }}
           </van-button>
-          <!--非本人都用button处理-->
           <button
-            v-if="!isSelf"
             plain
             class="my-button__btn"
             form-type="submit"
-            open-type="getUserInfo"
+            :open-type="isSelf ? 'share' : 'getUserInfo'"
             @click="beforeHandle('handleWaitSign')"
             @getuserinfo="getUserInfo"
           >
@@ -178,7 +172,7 @@
             form-type="submit"
             open-type="getUserInfo"
             @click="beforeHandle('handleComplete')"
-            @getuserinfo="getUserInfo"
+            @getuserinfo="val => getUserInfo(val, 'handleComplete')"
           >
           </button>
         </div>
@@ -203,10 +197,18 @@
       </van-button>
     </div>
 
-    <div class="t-l" v-if="false">
+    <div class="t-l" v-if="true">
       <p>isSelf: {{ isSelf }}</p>
       <p>isTarget: {{ isTarget }}</p>
       <p>isOther: {{ isOther }}</p>
+
+      <button
+        type="primary"
+        open-type="getUserInfo"
+        @getuserinfo="getUserInfo"
+      >
+        获取个人信息
+      </button>
     </div>
   </div>
 </template>
@@ -316,6 +318,11 @@ export default {
     this.getDetail()
   },
 
+  onHide () {
+    this.timer && clearInterval(this.timer)
+    console.log('clear timer.')
+  },
+
   onShareAppMessage () {
     const name = this.content.from.name
     return {
@@ -346,42 +353,66 @@ export default {
           if (this.userInfo && this.formId) {
             clearInterval(this.timer)
             console.log('timer is stopped')
+
+            if (this.isSelf) {
+              if (this.isWaitSign) {
+                this.saveFromUserFormId()
+                return false
+              }
+            }
+
             fn && this[fn](params)
           } else {
             console.log('timer is circling...')
           }
-        }, 100)
+        }, 10)
       } else {
         console.log('timer is exist!')
       }
     },
 
     getUserInfo (res) {
-      wx.showToast({ title: 'getUserInfo' })
       store.commit('setUser', Object.assign(res.mp.detail.userInfo))
-      // fn && this[fn](params)
+      wx.showToast({ title: 'getUserInfo' })
     },
 
     getFormIdAndToken (e) {
       wx.request({
         url: 'https://iming.work/api/getAccessToken',
         success: () => {
-          // this.templateSend(this.formId)
           this.formId = e.mp.detail.formId
           console.log('已获取token并记录formId')
+          // if (this.isWaitSign) {
+          // 只对这种情况处理，其余情况在button上绑定处理
+          // 因为在分享时，不会触发button的点击事件
+          // this.saveFromUserFormId()
+          // }
         }
       })
     },
 
-    handleCommon (status) {
+    saveFromUserFormId () {
+      Object.assign(detailBak, {
+        from: {
+          ...detailBak.from,
+          formId: this.formId
+        }
+      }).save().then(() => {
+        wx.showToast({ title: '更新from.fromFormId成功' })
+      })
+    },
+
+    handleCommon (status, opt) {
       this.loading = true
       // 响应式数据循环更新
-      return Object.assign(detailBak, { status }, {
+      return Object.assign(detailBak, {
+        status,
         to: Object.keys(this.content.to).length > 0 ? this.content.to : {
           name: this.userInfo.nickName,
           avatar: this.userInfo.avatarUrl,
           date: utils.getNow().full
         },
+        ...opt,
         // 只需要更改一次
         toUserId: this.content.toUserId ? this.content.toUserId : store.state.auth.openid
       }).save().then(() => {
@@ -392,11 +423,12 @@ export default {
     },
 
     handleWaitSign () {
-      this.handleCommon(WAIT_SIGN_CONFIRM).then(() => {
+      this.handleCommon(WAIT_SIGN_CONFIRM, { to: { formId: this.formId } }).then(() => {
         this.sendMessage({
           message: `您的承诺书已被${this.userInfo.nickName}签署，等待您确认~`,
           status: STATUS[WAIT_SIGN_CONFIRM].text,
-          openId: this.content.fromUserId
+          openId: this.content.fromUserId,
+          formId: this.content.from.formId
         })
       })
     },
@@ -404,7 +436,7 @@ export default {
     handleWaitSignConfirm (isTarget) {
       let status
       let message
-      const { needExchange, from, toUserId } = this.content
+      const { needExchange, from, toUserId, to } = this.content
 
       if (isTarget) {
         status = needExchange ? WAIT_COMPLETE : SIGN
@@ -414,31 +446,34 @@ export default {
         message = `甲方${from.name}驳回了您的签署，您不是乙方～`
       }
 
-      this.handleCommon(status).then(() => {
+      this.handleCommon(status, { from: { formId: this.formId } }).then(() => {
         this.sendMessage({
           message,
           status: STATUS[status].text,
-          openId: toUserId
+          openId: toUserId,
+          formId: to.formId
         })
       })
     },
 
     handleCompleteConfirm () {
-      this.handleCommon(WAIT_COMPLETE_CONFIRM).then(() => {
+      this.handleCommon(WAIT_COMPLETE_CONFIRM, { to: { formId: this.formId } }).then(() => {
         this.sendMessage({
           message: `承诺已被${this.content.to.name}兑现，请确认是否已兑现～`,
           status: STATUS[WAIT_COMPLETE_CONFIRM].text,
-          openId: this.content.fromUserId
+          openId: this.content.fromUserId,
+          formId: this.content.from.formId
         })
       })
     },
 
     handleComplete () {
-      this.handleCommon(COMPLETE).then(() => {
+      this.handleCommon(COMPLETE, { from: { formId: this.formId } }).then(() => {
         this.sendMessage({
           message: `甲方${this.content.from.name}已确认您兑现了承诺`,
           status: STATUS[COMPLETE].text,
-          openId: this.content.toUserId
+          openId: this.content.toUserId,
+          formId: this.content.to.formId
         })
       })
     },
@@ -447,7 +482,7 @@ export default {
       wx.request({
         url: 'https://iming.work/api/sendTemplateMessage',
         data: {
-          formId: this.formId,
+          formId: opt.formId,
           openId: opt.openId,
           page: `pages/detail/main?id=${this.$mp.query.id}`,
           templateId: 'keRZcuEsnmNUVh6I2qd9inGlabqRg2rzv628rmsiKNE',

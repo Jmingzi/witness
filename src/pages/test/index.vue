@@ -28,11 +28,10 @@ export default {
 
   methods: {
     getToken (e) {
-      this.formId = e.mp.detail.formId
       wx.request({
         url: 'https://iming.work/api/getAccessToken',
         success: () => {
-          this.templateSend(this.formId)
+          this.formId = e.mp.detail.formId
         }
       })
     },
@@ -59,6 +58,7 @@ export default {
     getUserInfo (res) {
       console.log(1)
       this.userInfo = JSON.stringify(res.mp.detail.userInfo.nickName)
+      this.templateSend(this.formId)
     }
   }
 }
