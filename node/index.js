@@ -69,8 +69,8 @@ const sendTemplateMessage = (reqUrl) => {
       keyword3: {
         value: params.value3
       }
-    },
-    emphasis_keyword: 'keyword1.DATA'
+    }
+    // emphasis_keyword: 'keyword1.DATA'
   })
 }
 
