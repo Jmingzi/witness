@@ -87,9 +87,11 @@ const server = http.createServer((req, res) => {
   } else if (/\/sendTemplateMessage/.test(req.url)) {
     sendTemplateMessage(req.url).then(data => {
       res.writeHead(200)
+      console.log('发送消息成功', data)
       res.end(JSON.stringify(data))
     }).catch(data => {
       res.writeHead(200)
+      console.log('发送消息失败', data)
       res.end(JSON.stringify(data))
     })
   } else if (req.url === '/addTemplate') {
