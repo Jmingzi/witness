@@ -15,7 +15,7 @@
         要
         <span>乙方</span>
         <span class="detail__to">
-          {{ content && content.to.name ? content && content.to.name : '' }}
+          {{ content && content.to.name && !isWaitSign ? content && content.to.name : '' }}
         </span>
         承诺以下内容：
         {{ content && content.content }}
@@ -95,104 +95,94 @@
         {{ isSelf ? status.noticeFromMe : (isTarget ? status.noticeFromTarget : otherNotice) }}
       </p>
 
-      <template v-if="status.btnText || status.btnTextSelf">
+      <form
+        v-if="status.btnText || status.btnTextSelf"
+        report-submit="true"
+        @submit="getFormIdAndToken"
+      >
         <div v-if="isWaitSign" class="my-button">
+          <!--van-button只用对本人时做分享-->
           <van-button
             size="large"
-            :loading="loading"
             custom-class="bg-main detail__btn c-ff"
-            @click="handleWaitSign"
-            :open-type="isSelf ? 'share' : ''"
+            open-type="share"
           >
             {{ isSelf ? status.btnTextSelf : status.btnText }}
           </van-button>
+          <!--非本人都用button处理-->
           <button
-            v-if="!userInfo && !isSelf"
-            class="my-button__btn"
-            open-type="getUserInfo"
-            @getuserinfo="val => getUserInfo(val, 'handleWaitSign')"
+            v-if="!isSelf"
             plain
+            class="my-button__btn"
+            form-type="submit"
+            :open-type="userInfo ? '' : 'getUserInfo'"
+            @click="beforeHandle('handleWaitSign')"
+            @getuserinfo="getUserInfo"
           >
           </button>
         </div>
 
         <template v-else-if="isWaitSignConfirm && isSelf">
           <div class="my-button">
-            <van-button
-              size="large"
-              :loading="loading"
-              custom-class="bg-main detail__btn c-ff"
-              @click="handleWaitSignConfirm(true)"
-            >
+            <van-button size="large" custom-class="bg-main detail__btn c-ff">
               {{ status.btnTextSelf }}
             </van-button>
             <button
-              v-if="!userInfo"
-              class="my-button__btn"
-              open-type="getUserInfo"
-              @getuserinfo="val => getUserInfo(val, 'handleWaitSignConfirm', true)"
               plain
+              class="my-button__btn"
+              form-type="submit"
+              :open-type="userInfo ? '' : 'getUserInfo'"
+              @click="beforeHandle('handleWaitSignConfirm', true)"
+              @getuserinfo="getUserInfo"
             >
             </button>
           </div>
           <div class="my-button">
-            <van-button
-              size="large"
-              :loading="loading"
-              custom-class="bg-ee m-t10 detail__btn c-ff"
-              @click="handleWaitSignConfirm(false)"
-            >
+            <van-button size="large" custom-class="bg-ee m-t10 detail__btn c-ff">
               {{ status.btnTextSelfSecond }}
             </van-button>
             <button
-              v-if="!userInfo"
-              class="my-button__btn"
-              open-type="getUserInfo"
-              @getuserinfo="val => getUserInfo(val, 'handleWaitSignConfirm', false)"
               plain
+              class="my-button__btn"
+              form-type="submit"
+              :open-type="userInfo ? '' : 'getUserInfo'"
+              @click="beforeHandle('handleWaitSignConfirm', false)"
+              @getuserinfo="getUserInfo"
             >
             </button>
           </div>
         </template>
 
         <div v-else-if="isWaitComplete && isTarget" class="my-button">
-          <van-button
-            size="large"
-            :loading="loading"
-            custom-class="bg-main detail__btn c-ff"
-            @click="handleCompleteConfirm"
-          >
+          <van-button size="large" custom-class="bg-main detail__btn c-ff">
             {{ status.btnText }}
           </van-button>
           <button
-            v-if="!userInfo"
-            class="my-button__btn"
-            open-type="getUserInfo"
-            @getuserinfo="val => getUserInfo(val, 'handleCompleteConfirm')"
             plain
+            class="my-button__btn"
+            form-type="submit"
+            :open-type="userInfo ? '' : 'getUserInfo'"
+            @click="beforeHandle('handleCompleteConfirm')"
+            @getuserinfo="getUserInfo"
           >
           </button>
         </div>
 
         <div v-else-if="isWaitCompleteConfirm && isSelf" class="my-button">
-          <van-button
-            size="large"
-            :loading="loading"
-            custom-class="bg-main detail__btn c-ff"
-            @click="handleComplete"
-          >
+          <van-button size="large" custom-class="bg-main detail__btn c-ff">
             {{ status.btnText }}
           </van-button>
           <button
-            v-if="!userInfo"
-            class="my-button__btn"
-            open-type="getUserInfo"
-            @getuserinfo="val => getUserInfo(val, 'handleComplete')"
             plain
+            class="my-button__btn"
+            form-type="submit"
+            :open-type="userInfo ? '' : 'getUserInfo'"
+            @click="beforeHandle('handleComplete')"
+            @getuserinfo="getUserInfo"
           >
           </button>
         </div>
-      </template>
+      </form>
 
       <van-button
         v-if="!isOther && (isSign || isComplete) || isOther && !isWaitSign"
@@ -244,7 +234,8 @@ export default {
   data () {
     return {
       loading: false,
-      content: null
+      content: null,
+      timer: null
     }
   },
 
@@ -349,15 +340,42 @@ export default {
         : false
     },
 
+    beforeHandle (fn, params) {
+      if (!this.timer) {
+        this.timer = setInterval(() => {
+          if (this.userInfo && this.formId) {
+            clearInterval(this.timer)
+            console.log('timer is stopped')
+            fn && this[fn](params)
+          } else {
+            console.log('timer is circling...')
+          }
+        }, 100)
+      } else {
+        console.log('timer is exist!')
+      }
+    },
+
     getUserInfo (res, fn, params) {
       store.commit('setUser', Object.assign(res.mp.detail.userInfo))
-      this[fn](params)
+      fn && this[fn](params)
+    },
+
+    getFormIdAndToken (e) {
+      this.formId = e.mp.detail.formId
+      wx.request({
+        url: 'https://iming.work/api/getAccessToken',
+        success: () => {
+          // this.templateSend(this.formId)
+          console.log('已获取token并记录formId')
+        }
+      })
     },
 
     handleCommon (status) {
       this.loading = true
       // 响应式数据循环更新
-      Object.assign(detailBak, { status }, {
+      return Object.assign(detailBak, { status }, {
         to: Object.keys(this.content.to).length > 0 ? this.content.to : {
           name: this.userInfo.nickName,
           avatar: this.userInfo.avatarUrl,
@@ -368,28 +386,79 @@ export default {
       }).save().then(() => {
         this.loading = false
         this.getDetail()
+        return ''
       })
     },
 
     handleWaitSign () {
-      if (this.isSelf) {
-        console.log('只做转发')
-      } else {
-        this.handleCommon(WAIT_SIGN_CONFIRM)
-      }
+      this.handleCommon(WAIT_SIGN_CONFIRM).then(() => {
+        this.sendMessage({
+          message: `您的承诺书已被${this.userInfo.nickName}签署，等待您确认~`,
+          status: STATUS[WAIT_SIGN_CONFIRM].text,
+          openId: this.content.fromUserId
+        })
+      })
     },
 
     handleWaitSignConfirm (isTarget) {
-      const status = this.content.needExchange ? WAIT_COMPLETE : SIGN
-      this.handleCommon(isTarget ? status : WAIT_SIGN)
+      let status
+      let message
+      const { needExchange, from, toUserId } = this.content
+
+      if (isTarget) {
+        status = needExchange ? WAIT_COMPLETE : SIGN
+        message = `您签署的承诺书已被甲方${from.name}确认${needExchange ? '，等待您兑现承诺～' : ''}`
+      } else {
+        status = WAIT_SIGN
+        message = `甲方${from.name}驳回了您的签署，您不是乙方～`
+      }
+
+      this.handleCommon(status).then(() => {
+        this.sendMessage({
+          message,
+          status: STATUS[status].text,
+          openId: toUserId
+        })
+      })
     },
 
     handleCompleteConfirm () {
-      this.handleCommon(WAIT_COMPLETE_CONFIRM)
+      this.handleCommon(WAIT_COMPLETE_CONFIRM).then(() => {
+        this.sendMessage({
+          message: `承诺已被${this.content.to.name}兑现，请确认是否已兑现～`,
+          status: STATUS[WAIT_COMPLETE_CONFIRM].text,
+          openId: this.content.fromUserId
+        })
+      })
     },
 
     handleComplete () {
-      this.handleCommon(COMPLETE)
+      this.handleCommon(COMPLETE).then(() => {
+        this.sendMessage({
+          message: `甲方${this.content.from.name}已确认您兑现了承诺`,
+          status: STATUS[COMPLETE].text,
+          openId: this.content.toUserId
+        })
+      })
+    },
+
+    sendMessage (opt) {
+      wx.request({
+        url: 'https://iming.work/api/sendTemplateMessage',
+        data: {
+          formId: this.formId,
+          openId: opt.openId,
+          page: `pages/detail/main?id=${this.$mp.query.id}`,
+          templateId: 'keRZcuEsnmNUVh6I2qd9inGlabqRg2rzv628rmsiKNE',
+          value1: opt.status,
+          value2: utils.getNow().fullTime,
+          value3: opt.message
+        },
+        success: (res) => {
+          console.log(res)
+          wx.showToast({ title: '发送消息回调' })
+        }
+      })
     },
 
     toIndex () {

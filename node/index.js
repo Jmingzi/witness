@@ -51,13 +51,14 @@ const sendTemplateMessage = (reqUrl) => {
 
   const search = reqUrl.substring(reqUrl.indexOf('?') + 1)
   const params = querystring.parse(search)
+  console.log('send message params:', params)
 
   return axios.post(url, {
     access_token: accessToken,
     touser: params.openId,
     template_id: params.templateId || templateId,
     form_id: params.formId,
-    page: params.page,
+    page: decodeURIComponent(params.page),
     data: {
       keyword1: {
         value: params.value1

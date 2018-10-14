@@ -8,6 +8,8 @@ function getNow (time) {
   let y = t.getFullYear()
   let m = t.getMonth() + 1
   let h = t.getDate()
+  let hour = t.getHours()
+  let minute = t.getMinutes()
 
   const res = {
     year: y,
@@ -17,6 +19,7 @@ function getNow (time) {
     full: ''
   }
   res.full = `${res.year}-${res.month}-${res.date}`
+  res.fullTime = `${res.full} ${hour}:${minute}`
   return res
 }
 
