@@ -88,7 +88,7 @@ const server = http.createServer((req, res) => {
     sendTemplateMessage(req.url).then(data => {
       res.writeHead(200)
       console.log('发送消息成功', data.data)
-      res.end(JSON.stringify(data))
+      res.end(JSON.stringify(data.data))
     }).catch(data => {
       res.writeHead(200)
       console.log('发送消息catch', data)
