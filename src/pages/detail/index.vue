@@ -500,9 +500,13 @@ export default {
           value2: utils.getNow().fullTime,
           value3: opt.message
         },
-        success: (res) => {
-          console.log(res)
-          wx.showToast({ title: '发送消息回调' })
+        success: () => {
+          wx.request({
+            url: 'https://iming.work/api/console',
+            data: {
+              msg: '发送消息成功...'
+            }
+          })
         }
       })
     },

@@ -26,18 +26,15 @@ const getAccessToken = () => {
   })
 }
 
-/**
- * deprecated
- * @returns {Promise|*|c|PromiseLike<T | never>|Promise<T | never>}
- */
-const addTemplate = () => {
-  const url = `https://api.weixin.qq.com/cgi-bin/wxopen/template/add?access_token=`
-  console.log(url)
-  return axios.post(url, {
-    id: '承诺状态通知',
-    keyword_id_list: [3, 4, 5]
-  }).then(res => {
-    return res.data
+const getQuery = (url) => {
+  const search = url.substring(url.indexOf('?') + 1)
+  return querystring.parse(search)
+}
+
+const logConsole = (url) => {
+  return Promise.resolve().then(() => {
+    const params = getQuery(url)
+    console.log(params.msg || 'receive message.')
   })
 }
 
@@ -49,9 +46,8 @@ const sendTemplateMessage = (reqUrl) => {
   const url = `https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=${accessToken}`
   const templateId = 'keRZcuEsnmNUVh6I2qd9isd2MOLM7LHAmry0RwURZ9k'
 
-  const search = reqUrl.substring(reqUrl.indexOf('?') + 1)
-  const params = querystring.parse(search)
-  console.log('send message params:', params)
+  const params = getQuery(reqUrl)
+  console.log('send message params:\n', params)
 
   return axios.post(url, {
     access_token: accessToken,
@@ -76,7 +72,7 @@ const sendTemplateMessage = (reqUrl) => {
 
 const server = http.createServer((req, res) => {
   console.log(req.url)
-  if (/getAccessToken/.test(req.url)) {
+  if (/\/getAccessToken/.test(req.url)) {
     getAccessToken().then(token => {
       res.writeHead(200)
       res.end(JSON.stringify({ token }))
@@ -94,8 +90,8 @@ const server = http.createServer((req, res) => {
       console.log('发送消息catch', data)
       res.end(JSON.stringify(data))
     })
-  } else if (req.url === '/addTemplate') {
-    addTemplate().then(data => {
+  } else if (/\/console/.test(req.url)) {
+    logConsole(req.url).then(data => {
       res.writeHead(200)
       res.end(JSON.stringify(data))
     }).catch(data => {
@@ -106,5 +102,5 @@ const server = http.createServer((req, res) => {
 })
 
 server.listen(3001, () => {
-  console.log('server is start')
+  console.log('server is start at http://localhost:3001')
 })
