@@ -396,7 +396,8 @@ export default {
           formId: this.formId
         }
       }).save().then(() => {
-        wx.showToast({ title: '操作成功' })
+        // wx.showToast({ title: '操作成功' })
+        this.sendLog('更新发起人form_id成功...')
       })
     },
 
@@ -501,12 +502,16 @@ export default {
           value3: opt.message
         },
         success: () => {
-          wx.request({
-            url: 'https://iming.work/api/console',
-            data: {
-              msg: '发送消息成功...'
-            }
-          })
+          this.sendLog('发送消息成功...')
+        }
+      })
+    },
+
+    sendLog (msg) {
+      wx.request({
+        url: 'https://iming.work/api/console',
+        data: {
+          msg
         }
       })
     },
