@@ -130,7 +130,7 @@ async function getResponseText (text, { openid }) {
   const data = _.groupBy(list, 'title')
   const listInfo = Object.keys(data).map(title => {
     const nameInfo = data[title].map(x => `${x.name}: ${x.number}`).join('\n')
-    return `${title}\n${nameInfo}`
+    return `【${title}】\n${nameInfo}`
   }).join('\n\n')
   return `${optText}\n${listInfo}`
 }
