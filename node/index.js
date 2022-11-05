@@ -83,6 +83,7 @@ async function getResponseText (text) {
 }
 
 function handleMessage (bodyString) {
+  console.log(`消息内容: ${bodyString}`)
   parseString(Buffer.from(bodyString).toString('utf-8'), { explicitArray: false }, async (err, result) => {
     if (err) {
       //打印错误信息
