@@ -20,7 +20,7 @@ async function getAvTable (data) {
   let av
   const res = await finOne(data)
   if (res) {
-    av = AV.Object.createWithoutData('CardBag', res.id)
+    av = AV.Object.createWithoutData('CardBag', res.objectId)
   } else {
     const A = AV.Object.extend('CardBag')
     av = new A()
@@ -68,12 +68,12 @@ async function delAv (openid, title, name) {
   const data = { openid, title, name }
   const item = await finOne(data)
   if (item) {
-    const av = AV.Object.createWithoutData('CardBag', item.id)
+    const av = AV.Object.createWithoutData('CardBag', item.objectId)
     return av.destroy()
   }
 }
 
-// addAv('ouYfM5uypR6mMj1GUTyv-BOUr4-s', '建设银行', '登录密码', '899528')
+addAv('ouYfM5uypR6mMj1GUTyv-BOUr4-s', '建设银行', '登录密码', '899528')
 
 module.exports = {
   getAv,
