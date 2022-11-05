@@ -31,37 +31,37 @@ const getAccessToken = () => {
   })
 }
 
-const sendTemplateMessage = (reqUrl) => {
-  if (!accessToken) {
-    throw new Error('请先获取token，/api/getAccessToken')
-  }
-
-  const url = `https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=${accessToken}`
-  const templateId = 'keRZcuEsnmNUVh6I2qd9isd2MOLM7LHAmry0RwURZ9k'
-
-  const params = getQuery(reqUrl)
-  console.log('send message params:\n', params)
-
-  return axios.post(url, {
-    access_token: accessToken,
-    touser: params.openId,
-    template_id: params.templateId || templateId,
-    form_id: params.formId,
-    page: params.page,
-    data: {
-      keyword1: {
-        value: params.value1
-      },
-      keyword2: {
-        value: params.value2
-      },
-      keyword3: {
-        value: params.value3
-      }
-    }
-    // emphasis_keyword: 'keyword1.DATA'
-  })
-}
+// const sendTemplateMessage = (reqUrl) => {
+//   if (!accessToken) {
+//     throw new Error('请先获取token，/api/getAccessToken')
+//   }
+//
+//   const url = `https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=${accessToken}`
+//   const templateId = 'keRZcuEsnmNUVh6I2qd9isd2MOLM7LHAmry0RwURZ9k'
+//
+//   const params = getQuery(reqUrl)
+//   console.log('send message params:\n', params)
+//
+//   return axios.post(url, {
+//     access_token: accessToken,
+//     touser: params.openId,
+//     template_id: params.templateId || templateId,
+//     form_id: params.formId,
+//     page: params.page,
+//     data: {
+//       keyword1: {
+//         value: params.value1
+//       },
+//       keyword2: {
+//         value: params.value2
+//       },
+//       keyword3: {
+//         value: params.value3
+//       }
+//     }
+//     // emphasis_keyword: 'keyword1.DATA'
+//   })
+// }
 
 const uri = {
   '/wx/checkstatus': function (query, bodyString) {
@@ -106,23 +106,24 @@ async function getResponseText (text, { openid }) {
   let optText = ''
   let list = []
   // 格式化口令
-  const [cmd, title, name, number] = input.split('+')
-  if (cmd == 0) {
+  const [cmd2, title, name, number] = input.split('+')
+  const cmd = Number(cmd2)
+  if (cmd === 0) {
     return help
-  } else if (cmd == 1) {
+  } else if (cmd === 1) {
     optText = '查询账号信息成功!'
     list = await getAv(openid, 'app')
-  } else if (cmd == 2) {
+  } else if (cmd === 2) {
     optText = '查询卡信息成功!'
     list = await getAv(openid, 'card')
-  } else if (cmd == 3) {
+  } else if (cmd === 3) {
     const { obj, exist } = await addAv(openid, title, name, number)
     optText = exist ? '更新成功!' : '新增成功!'
     list = [obj]
-  } else if (cmd == 4) {
+  } else if (cmd === 4) {
     const res = await delAv(openid, title, name)
     return res === undefined ? '没有找到你要删除的数据～，输入 0 查看操作指引' : `删除成功了~ ，输入 0 查看操作指引`
-  } else if (cmd == 5) {
+  } else if (cmd === 5) {
     delete state.loginMap[openid]
     return `退出口令成功！，输入 0 查看操作指引`
   } else {
@@ -136,7 +137,7 @@ async function getResponseText (text, { openid }) {
   }
   const data = _.groupBy(list, 'title')
   const listInfo = Object.keys(data).map(title => {
-    const nameInfo = data[title].map(x => `${x.name}: <a herf="${x.number}">${x.number}</a>`).join('\n')
+    const nameInfo = data[title].map(x => `${x.name}: <a herf="tel://${x.number}">${x.number}</a>`).join('\n')
     return `【${title}】\n${nameInfo}`
   }).join('\n\n')
   return `${optText}\n${listInfo}`
@@ -145,26 +146,26 @@ async function getResponseText (text, { openid }) {
 function handleMessage (bodyString, query) {
   parseString(Buffer.from(bodyString).toString('utf-8'), { explicitArray: false }, async (err, result) => {
     if (err) {
-      //打印错误信息
+      // 打印错误信息
       console.log(err)
     } else {
-      //打印解析结果
+      // 打印解析结果
       result = result.xml
-      const toUser = result.ToUserName //接收方微信
-      const fromUser = result.FromUserName //发送仿微信
+      const toUser = result.ToUserName // 接收方微信
+      const fromUser = result.FromUserName // 发送仿微信
       if (result.Event) {
-        //处理事件类型
+        // 处理事件类型
         switch (result.Event) {
-          case "subscribe":
-            //关注公众号
-            break;
+          case 'subscribe':
+            // 关注公众号
+            break
           default:
         }
       } else {
-        //处理消息类型
+        // 处理消息类型
         switch (result.MsgType) {
-          case "text":
-            //处理文本消息
+          case 'text':
+            // 处理文本消息
             this.end(`<xml>
   <ToUserName><![CDATA[${fromUser}]]></ToUserName>
   <FromUserName><![CDATA[${toUser}]]></FromUserName>
@@ -172,25 +173,25 @@ function handleMessage (bodyString, query) {
   <MsgType><![CDATA[text]]></MsgType>
   <Content><![CDATA[${await getResponseText(result.Content, query)}]]></Content>
 </xml>`)
-            break;
-          case "image":
-            //处理图片消息
-            break;
-          case "voice":
-            //处理语音消息
-            break;
-          case "video":
-            //处理视频消息
-            break;
-          case "shortvideo":
-            //处理小视频消息
-            break;
-          case "location":
-            //处理发送地理位置
-            break;
-          case "link":
-            //处理点击链接消息
-            break;
+            break
+          case 'image':
+            // 处理图片消息
+            break
+          case 'voice':
+            // 处理语音消息
+            break
+          case 'video':
+            // 处理视频消息
+            break
+          case 'shortvideo':
+            // 处理小视频消息
+            break
+          case 'location':
+            // 处理发送地理位置
+            break
+          case 'link':
+            // 处理点击链接消息
+            break
           default:
             this.end('')
         }
@@ -203,10 +204,10 @@ const server = http.createServer((req, res) => {
   // console.log(req.url)
   const { query } = url.parse(req.url, true)
   let body = ''
-  req.on('data', function(chunk){
+  req.on('data', function (chunk) {
     body += chunk
   })
-  req.on('end', function(){
+  req.on('end', function () {
     // body = querystring.parse(body)
     // handleResponse(req, res, query, body)
     const path = req.url.split('?')[0]

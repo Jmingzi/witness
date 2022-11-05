@@ -1,5 +1,4 @@
 const AV = require('leancloud-storage')
-const {ins} = require("postcss-mpvue-wxss/lib/wxmlTagMap");
 const { Query, User } = AV
 
 const appId = 'iYzWnL2H72jtQgNQPXUvjFqU-gzGzoHsz'
