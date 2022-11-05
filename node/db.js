@@ -1,4 +1,5 @@
 const AV = require('leancloud-storage')
+const {ins} = require("postcss-mpvue-wxss/lib/wxmlTagMap");
 const { Query, User } = AV
 
 const appId = 'iYzWnL2H72jtQgNQPXUvjFqU-gzGzoHsz'
@@ -71,10 +72,20 @@ async function delAv (openid, title, name) {
   }
 }
 
+async function searchAv (openid, text) {
+  const instance = new Query('CardBag')
+  instance.equalTo('openid', openid)
+  instance.contains('title', text)
+  instance.descending('createdAt')
+  const res = await instance.find()
+  return res.map(x => x.toJSON())
+}
+
 // addAv('ouYfM5uypR6mMj1GUTyv-BOUr4-s', '建设银行', '登录密码', '899528')
 
 module.exports = {
   getAv,
   addAv,
-  delAv
+  delAv,
+  searchAv
 }

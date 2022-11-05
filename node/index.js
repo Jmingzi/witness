@@ -3,7 +3,7 @@ const axios = require('axios')
 const url = require('url')
 const sha1 = require('sha1')
 const parseString = require('xml2js').parseString
-const { getAv, addAv, delAv } = require('./db')
+const { getAv, addAv, delAv, searchAv } = require('./db')
 const _ = require('lodash')
 
 const state = {
@@ -72,7 +72,7 @@ const uri = {
     if (signature === sha) {
       bodyString ? handleMessage.call(this, bodyString, query) : this.end(echostr)
     } else {
-      //验证失败
+      // 验证失败
       this.end('error')
     }
   },
@@ -125,6 +125,10 @@ async function getResponseText (text, { openid }) {
   } else if (cmd == 5) {
     delete state.loginMap[openid]
     return `退出口令成功！，输入 0 查看操作指引`
+  } else {
+    // 模糊匹配
+    optText = '查询成功！'
+    list = await searchAv(openid, text)
   }
 
   if (!list.length) {
