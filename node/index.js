@@ -81,7 +81,7 @@ const uri = {
 }
 
 function handleMessage (bodyString) {
-  parseString(Buffer.concat(bodyString).toString('utf-8'), { explicitArray: false }, function (err, result) {
+  parseString(Buffer.from(bodyString).toString('utf-8'), { explicitArray: false }, function (err, result) {
     if (err) {
       //打印错误信息
       console.log(err)
