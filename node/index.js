@@ -68,8 +68,6 @@ const uri = {
     const newLocalToken = [nonce, timestamp, token].sort().join('')
     const sha = sha1(newLocalToken)
     if (signature === sha) {
-      console.log(query)
-      console.log(body)
       this.end(echostr)
     } else {
       //验证失败
@@ -97,6 +95,7 @@ function handleResponse (req, res, query, body) {
 }
 
 const server = http.createServer((req, res) => {
+  console.log(req.url)
   const { query } = url.parse(req.url, true)
   let body = ''
   req.on('data', function(chunk){
