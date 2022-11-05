@@ -94,7 +94,7 @@ async function getResponseText (text, { openid }) {
   const input = text.trim()
   if (input === '小柠檬') {
     state.loginMap[openid] = true
-    return `口令输入正确！可以输入如下指令进行操作：\n\n[1] 输入任意字符查询账号卡信息\n[2] 输入 1 查询我的账号信息[3] 输入 2 查询我的卡信息\n[4] 输入 3+建设银行+卡号+123456 添加/覆盖信息\n[5] 输入 4+建设银行+卡号，删除一条信息\n[6] 输入 5，退出登录口令`
+    return `口令输入正确！可以输入如下指令进行操作：\n\n✅ 输入任意字符查询账号卡信息\n📱 输入 1 查询我的账号信息\n🏦 输入 2 查询我的卡信息\n✒️ 输入 3+建设银行+卡号+123456 添加/覆盖信息\n❌ 输入 4+建设银行+卡号，删除一条信息\n😡 输入 5，退出登录口令`
   }
 
   if (!state.loginMap[openid]) {
