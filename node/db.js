@@ -16,6 +16,16 @@ async function getAv (openid, type) {
   return res.map(x => x.toJSON())
 }
 
+async function finOne ({ title, name, number, openid }) {
+  // 根据 title, name, number 查询唯一
+  const instance = new Query('CardBag')
+  instance.equalTo('openid', openid)
+  instance.equalTo('title', title)
+  instance.equalTo('name', name)
+  const res = (await instance.find()).map(x => x.toJSON())
+  return res[0]
+}
+
 async function getAvTable (data) {
   let av
   const res = await finOne(data)
@@ -29,19 +39,6 @@ async function getAvTable (data) {
     av,
     exist: !!res
   }
-}
-
-async function finOne ({ title, name, number, openid }) {
-  // 根据 title, name, number 查询唯一
-  const instance = new Query('CardBag')
-  instance.equalTo('openid', openid)
-  instance.equalTo('title', title)
-  instance.equalTo('name', name)
-  if (number) {
-    instance.equalTo('number', number)
-  }
-  const res = (await instance.find()).map(x => x.toJSON())
-  return res[0]
 }
 
 async function addAv (openid, title, name, number) {
