@@ -62,12 +62,14 @@ const sendTemplateMessage = (reqUrl) => {
 }
 
 const uri = {
-  '/wx/checkstatus': function (query) {
+  '/wx/checkstatus': function (query, body) {
     const token = 'wxtoken'
     const { signature, timestamp, echostr, nonce } = query || {}
     const newLocalToken = [nonce, timestamp, token].sort().join('')
     const sha = sha1(newLocalToken)
     if (signature === sha) {
+      console.log(query)
+      console.log(body)
       this.end(echostr)
     } else {
       //验证失败
