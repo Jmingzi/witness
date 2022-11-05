@@ -16,7 +16,7 @@ async function getAv (openid, type) {
   return res.map(x => x.toJSON())
 }
 
-async function getAvTable(data) {
+async function getAvTable (data) {
   let av
   const res = await finOne(data)
   if (res) {
@@ -45,13 +45,13 @@ async function finOne ({ title, name, number, openid }) {
 }
 
 async function addAv (openid, title, name, number) {
-  const data = { openid, title, name, number, type: /银行/.test(name) ? 'card' : 'app' }
+  const data = { openid, title, name, number, type: /银行/.test(title) ? 'card' : 'app' }
   const cur = await User.current()
   if (!cur) {
     await User.logIn('jmingzi', 'ck.123456')
   }
 
-  const { av, exist } = getAvTable(data)
+  const { av, exist } = await getAvTable(data)
   Object.keys(data).forEach(key => {
     if (key !== 'id') {
       av.set(key, data[key])
@@ -72,6 +72,8 @@ async function delAv (openid, title, name) {
     return av.destroy()
   }
 }
+
+// addAv('ouYfM5uypR6mMj1GUTyv-BOUr4-s', '建设银行', '登录密码', '899528')
 
 module.exports = {
   getAv,
