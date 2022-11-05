@@ -71,8 +71,12 @@ const sendTemplateMessage = (reqUrl) => {
   })
 }
 
+const uri = {
+
+}
+
 function handleResponse (req, res, query, body) {
-  console.log(query)
+  console.log(req.url)
   const token = 'wxtoken'
   const { signature, timestamp, echostr, nonce } = query || {}
   const newLocalToken = [nonce, timestamp, token].sort().join('')
