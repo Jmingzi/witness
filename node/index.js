@@ -78,7 +78,8 @@ const uri = {
 
 async function getResponseText (text) {
   const list = await getAv()
-  return JSON.stringify(list)
+  // JSON.stringify(list)
+  return `<a href="javascript:;">操作1</a> 222 <br> 333`
 }
 
 function handleMessage (bodyString) {
