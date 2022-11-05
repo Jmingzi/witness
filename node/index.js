@@ -4,8 +4,8 @@
 
 const http = require('http')
 const axios = require('axios')
-// const token = '14_9Fzm8-PigyNupNE88aLCfUD1Bl12LocVky8flnUaeDSSSnlmbu6fQxj-sx9daMiYNezv4xuYIMsgccptIze9--mNLBhkaGxHvnqAvTBnhKk-7Rv0nUcxero6xT3CBrnjJTv5bfvUVlus-1AQECFjAHAYWZ'
 const querystring = require('querystring')
+const url = require('url')
 
 let getTokenStartTime
 let expireSeconds
@@ -70,35 +70,49 @@ const sendTemplateMessage = (reqUrl) => {
   })
 }
 
+function handleResponse (req, res, params, body) {
+  res.writeHead(200)
+  res.end(JSON.stringify({ body, params }))
+}
+
 const server = http.createServer((req, res) => {
-  console.log(req.url)
-  if (/\/getAccessToken/.test(req.url)) {
-    getAccessToken().then(token => {
-      res.writeHead(200)
-      res.end(JSON.stringify({ token }))
-    }).catch(res => {
-      res.writeHead(200)
-      res.end(JSON.stringify({ ...res.data }))
-    })
-  } else if (/\/sendTemplateMessage/.test(req.url)) {
-    sendTemplateMessage(req.url).then(data => {
-      res.writeHead(200)
-      console.log('发送消息成功', data.data)
-      res.end(JSON.stringify(data.data))
-    }).catch(data => {
-      res.writeHead(200)
-      console.log('发送消息catch', data)
-      res.end(JSON.stringify(data))
-    })
-  } else if (/\/console/.test(req.url)) {
-    logConsole(req.url).then(data => {
-      res.writeHead(200)
-      res.end(JSON.stringify(data))
-    }).catch(data => {
-      res.writeHead(200)
-      res.end(JSON.stringify(data))
-    })
-  }
+  const params = url.parse(req.url, true).query
+  let body = ''
+  req.on('data', function(chunk){
+    body += chunk
+  })
+  req.on('end', function(){
+    body = querystring.parse(body)
+    handleResponse(req, res, params, body)
+  })
+
+  // if (/\/getAccessToken/.test(req.url)) {
+  //   getAccessToken().then(token => {
+  //     res.writeHead(200)
+  //     res.end(JSON.stringify({ token }))
+  //   }).catch(res => {
+  //     res.writeHead(200)
+  //     res.end(JSON.stringify({ ...res.data }))
+  //   })
+  // } else if (/\/sendTemplateMessage/.test(req.url)) {
+  //   sendTemplateMessage(req.url).then(data => {
+  //     res.writeHead(200)
+  //     console.log('发送消息成功', data.data)
+  //     res.end(JSON.stringify(data.data))
+  //   }).catch(data => {
+  //     res.writeHead(200)
+  //     console.log('发送消息catch', data)
+  //     res.end(JSON.stringify(data))
+  //   })
+  // } else if (/\/console/.test(req.url)) {
+  //   logConsole(req.url).then(data => {
+  //     res.writeHead(200)
+  //     res.end(JSON.stringify(data))
+  //   }).catch(data => {
+  //     res.writeHead(200)
+  //     res.end(JSON.stringify(data))
+  //   })
+  // }
 })
 
 server.listen(3001, () => {
