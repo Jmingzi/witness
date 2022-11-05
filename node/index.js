@@ -6,6 +6,7 @@ const http = require('http')
 const axios = require('axios')
 const querystring = require('querystring')
 const url = require('url')
+const sha1 = require('sha1')
 
 let getTokenStartTime
 let expireSeconds
@@ -70,20 +71,30 @@ const sendTemplateMessage = (reqUrl) => {
   })
 }
 
-function handleResponse (req, res, params, body) {
-  res.writeHead(200)
-  res.end(JSON.stringify({ body, params }))
+function handleResponse (req, res, query, body) {
+  const token = 'wxtoken'
+  const { signature, timestamp, echostr, nonce } = query || {}
+  const newLocalToken = [nonce, timestamp, token].sort().join('')
+  const sha = sha1(newLocalToken)
+  if (signature === sha) {
+    res.send(echostr)
+  } else {
+    //验证失败
+    res.send({ "message": "error" })
+  }
+  // res.writeHead(200)
+  // res.end(JSON.stringify({ body, query }))
 }
 
 const server = http.createServer((req, res) => {
-  const params = url.parse(req.url, true).query
+  const { query } = url.parse(req.url, true)
   let body = ''
   req.on('data', function(chunk){
     body += chunk
   })
   req.on('end', function(){
     body = querystring.parse(body)
-    handleResponse(req, res, params, body)
+    handleResponse(req, res, query, body)
   })
 
   // if (/\/getAccessToken/.test(req.url)) {
