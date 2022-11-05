@@ -1,5 +1,5 @@
 const AV = require('leancloud-storage')
-const { Query, User, Object } = AV
+const { Query, User } = AV
 
 const appId = 'iYzWnL2H72jtQgNQPXUvjFqU-gzGzoHsz'
 const appKey = 'OR3zEynwWJ7f8bk95AdiGFzJ'
@@ -20,9 +20,9 @@ async function getAvTable(data) {
   let av
   const res = await finOne(data)
   if (res) {
-    av = Object.createWithoutData('CardBag', res.id)
+    av = AV.Object.createWithoutData('CardBag', res.id)
   } else {
-    const A = Object.extend('CardBag')
+    const A = AV.Object.extend('CardBag')
     av = new A()
   }
   return {
@@ -68,7 +68,7 @@ async function delAv (openid, title, name) {
   const data = { openid, title, name }
   const item = await finOne(data)
   if (item) {
-    const av = Object.createWithoutData('CardBag', item.id)
+    const av = AV.Object.createWithoutData('CardBag', item.id)
     return av.destroy()
   }
 }
