@@ -78,10 +78,10 @@ function handleResponse (req, res, query, body) {
   const newLocalToken = [nonce, timestamp, token].sort().join('')
   const sha = sha1(newLocalToken)
   if (signature === sha) {
-    res.send(echostr)
+    res.end(echostr)
   } else {
     //验证失败
-    res.send({ "message": "error" })
+    res.end({ "message": "error" })
   }
   // res.writeHead(200)
   // res.end(JSON.stringify({ body, query }))
