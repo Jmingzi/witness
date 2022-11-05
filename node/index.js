@@ -4,6 +4,7 @@ const url = require('url')
 const sha1 = require('sha1')
 const parseString = require('xml2js').parseString
 const { getAv } = require('./db')
+const _ = require('lodash')
 
 const state = {
   loginMap: {}
@@ -90,7 +91,7 @@ const uri = {
  * 5：退出登录
  */
 async function getResponseText (text, { openid }) {
-  console.log('text', text)
+  console.log('openid', openid, 'text', text)
   const input = text.trim()
   if (input === '小柠檬') {
     state.loginMap[openid] = true
@@ -101,9 +102,33 @@ async function getResponseText (text, { openid }) {
     return '请输入口令继续～'
   }
 
-  const list = await getAv()
-  // JSON.stringify(list)
-  return `<a href="#操作">操作1</a> 222\n 333`
+  let optText = ''
+  let list = []
+  // 格式化口令
+  const [cmd, title, name, number] = input.split('+')
+  if (cmd == 1) {
+    optText = '查询成功!'
+    list = await getAv(openid, 'app')
+  } else if (cmd == 2) {
+    optText = '查询成功!'
+    list = await getAv(openid, 'card')
+  } else if (cmd == 3) {
+
+  } else if (cmd == 4) {
+
+  } else if (cmd == 5) {
+
+  }
+
+  if (!list.length) {
+    return '没有查询到信息，请输入再精确点~'
+  }
+  const data = _.groupBy(list, 'title')
+  const listInfo = Object.keys(data).map(title => {
+    const nameInfo = data[title].map(x => `${x.name}: ${x.number}`).join('\n')
+    return `${title}\n${nameInfo}`
+  }).join('\n\n')
+  return `${optText}\n${listInfo}`
 }
 
 function handleMessage (bodyString, query) {

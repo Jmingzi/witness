@@ -6,10 +6,10 @@ const appKey = 'OR3zEynwWJ7f8bk95AdiGFzJ'
 const serverURLs = 'https://api.iming.work'
 AV.init({ appId, appKey, serverURLs })
 
-function getAv () {
+function getAv (openid, type) {
   const instance = new Query('CardBag')
-  instance.select(['name', 'pwdJsonString'])
-  // instance.notEqualTo('type', 'record-days')
+  instance.equalTo('type', type)
+  instance.equalTo('openid', openid)
   instance.descending('createdAt')
   return instance.find()
 }
