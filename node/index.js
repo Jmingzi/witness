@@ -104,9 +104,9 @@ function handleMessage (bodyString) {
           case "text":
             //处理文本消息
             this.end(`<xml>
-  <ToUserName><![CDATA[${toUser}]]></ToUserName>
-  <FromUserName><![CDATA[${fromUser}]]></FromUserName>
-  <CreateTime>${Date.now()}</CreateTime>
+  <ToUserName><![CDATA[${fromUser}]]></ToUserName>
+  <FromUserName><![CDATA[${toUser}]]></FromUserName>
+  <CreateTime>${result.CreateTime}</CreateTime>
   <MsgType><![CDATA[text]]></MsgType>
   <Content><![CDATA[你好]]></Content>
 </xml>`)
