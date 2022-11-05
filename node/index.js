@@ -1,13 +1,9 @@
-/**
- * 获取小程序access_token
- */
-
 const http = require('http')
 const axios = require('axios')
-// const querystring = require('querystring')
 const url = require('url')
 const sha1 = require('sha1')
 const parseString = require('xml2js').parseString
+const { getAv } = require('./db')
 
 let getTokenStartTime
 let expireSeconds
@@ -80,8 +76,13 @@ const uri = {
   }
 }
 
+async function getResponseText (text) {
+  const list = await getAv()
+  return JSON.stringify(list)
+}
+
 function handleMessage (bodyString) {
-  parseString(Buffer.from(bodyString).toString('utf-8'), { explicitArray: false }, (err, result) => {
+  parseString(Buffer.from(bodyString).toString('utf-8'), { explicitArray: false }, async (err, result) => {
     if (err) {
       //打印错误信息
       console.log(err)
@@ -108,7 +109,7 @@ function handleMessage (bodyString) {
   <FromUserName><![CDATA[${toUser}]]></FromUserName>
   <CreateTime>${result.CreateTime}</CreateTime>
   <MsgType><![CDATA[text]]></MsgType>
-  <Content><![CDATA[你好]]></Content>
+  <Content><![CDATA[${await getResponseText(result.Content)}]]></Content>
 </xml>`)
             break;
           case "image":
@@ -130,6 +131,7 @@ function handleMessage (bodyString) {
             //处理点击链接消息
             break;
           default:
+            this.end('')
         }
       }
     }
@@ -162,34 +164,6 @@ const server = http.createServer((req, res) => {
     // body = querystring.parse(body)
     handleResponse(req, res, query, body)
   })
-
-  // if (/\/getAccessToken/.test(req.url)) {
-  //   getAccessToken().then(token => {
-  //     res.writeHead(200)
-  //     res.end(JSON.stringify({ token }))
-  //   }).catch(res => {
-  //     res.writeHead(200)
-  //     res.end(JSON.stringify({ ...res.data }))
-  //   })
-  // } else if (/\/sendTemplateMessage/.test(req.url)) {
-  //   sendTemplateMessage(req.url).then(data => {
-  //     res.writeHead(200)
-  //     console.log('发送消息成功', data.data)
-  //     res.end(JSON.stringify(data.data))
-  //   }).catch(data => {
-  //     res.writeHead(200)
-  //     console.log('发送消息catch', data)
-  //     res.end(JSON.stringify(data))
-  //   })
-  // } else if (/\/console/.test(req.url)) {
-  //   logConsole(req.url).then(data => {
-  //     res.writeHead(200)
-  //     res.end(JSON.stringify(data))
-  //   }).catch(data => {
-  //     res.writeHead(200)
-  //     res.end(JSON.stringify(data))
-  //   })
-  // }
 })
 
 server.listen(3001, () => {
