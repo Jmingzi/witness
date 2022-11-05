@@ -90,6 +90,7 @@ const uri = {
  * 5：退出登录
  */
 async function getResponseText (text, { openid }) {
+  console.log('text', text)
   if (!state.loginMap[openid]) {
     return '请输入口令继续～'
   }
@@ -106,7 +107,6 @@ async function getResponseText (text, { openid }) {
 }
 
 function handleMessage (bodyString, query) {
-  console.log(`消息内容: ${bodyString}`)
   parseString(Buffer.from(bodyString).toString('utf-8'), { explicitArray: false }, async (err, result) => {
     if (err) {
       //打印错误信息
@@ -163,23 +163,8 @@ function handleMessage (bodyString, query) {
   })
 }
 
-// function send (res, obj) {
-//   res.writeHead(200)
-//   res.end(JSON.stringify(obj))
-// }
-
-function handleResponse (req, res, query, bodyString) {
-  const path = req.url.split('?')[0]
-  if (!uri[path]) {
-    console.log(path, '没有匹配到方法...')
-    return res.end('没有匹配到方法')
-  }
-
-  uri[path].call(res, query, bodyString)
-}
-
 const server = http.createServer((req, res) => {
-  console.log(req.url)
+  // console.log(req.url)
   const { query } = url.parse(req.url, true)
   let body = ''
   req.on('data', function(chunk){
@@ -187,7 +172,14 @@ const server = http.createServer((req, res) => {
   })
   req.on('end', function(){
     // body = querystring.parse(body)
-    handleResponse(req, res, query, body)
+    // handleResponse(req, res, query, body)
+    const path = req.url.split('?')[0]
+    if (!uri[path]) {
+      console.log(path, '没有匹配到方法...')
+      return res.end('没有匹配到方法')
+    }
+
+    uri[path].call(res, query, body)
   })
 })
 
