@@ -3,7 +3,7 @@ const axios = require('axios')
 const url = require('url')
 const sha1 = require('sha1')
 const parseString = require('xml2js').parseString
-const { getAv } = require('./db')
+const { getAv, addAv, delAv } = require('./db')
 const _ = require('lodash')
 
 const state = {
@@ -113,15 +113,19 @@ async function getResponseText (text, { openid }) {
     optText = '查询成功!'
     list = await getAv(openid, 'card')
   } else if (cmd == 3) {
-
+    const { obj, exist } = await addAv(openid, title, name, number)
+    optText = exist ? '更新成功!' : '新增成功!'
+    list = [obj]
   } else if (cmd == 4) {
-
+    const res = await delAv(openid, title, name)
+    return res === undefined ? '没有找到你要删除的数据～' : '删除成功了~'
   } else if (cmd == 5) {
-
+    delete state.loginMap[openid]
+    return '退出口令成功！'
   }
 
   if (!list.length) {
-    return '没有查询到信息，请输入再精确点~'
+    return '没有查询到信息呢，看看是不是输错了~'
   }
   const data = _.groupBy(list, 'title')
   const listInfo = Object.keys(data).map(title => {
