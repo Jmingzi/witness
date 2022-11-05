@@ -107,10 +107,10 @@ async function getResponseText (text, { openid }) {
   // 格式化口令
   const [cmd, title, name, number] = input.split('+')
   if (cmd == 1) {
-    optText = '查询成功!'
+    optText = '查询账号信息成功!'
     list = await getAv(openid, 'app')
   } else if (cmd == 2) {
-    optText = '查询成功!'
+    optText = '查询卡信息成功!'
     list = await getAv(openid, 'card')
   } else if (cmd == 3) {
     const { obj, exist } = await addAv(openid, title, name, number)

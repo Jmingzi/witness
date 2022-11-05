@@ -45,7 +45,7 @@ async function finOne ({ title, name, number, openid }) {
 }
 
 async function addAv (openid, title, name, number) {
-  const data = { openid, title, name, number }
+  const data = { openid, title, name, number, type: /银行/.test(name) ? 'card' : 'app' }
   const cur = await User.current()
   if (!cur) {
     await User.logIn('jmingzi', 'ck.123456')
