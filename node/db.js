@@ -71,7 +71,7 @@ async function delAv (openid, title, name) {
   }
 }
 
-addAv('ouYfM5uypR6mMj1GUTyv-BOUr4-s', '建设银行', '登录密码', '899528')
+// addAv('ouYfM5uypR6mMj1GUTyv-BOUr4-s', '建设银行', '登录密码', '899528')
 
 module.exports = {
   getAv,
