@@ -4,9 +4,10 @@
 
 const http = require('http')
 const axios = require('axios')
-const querystring = require('querystring')
+// const querystring = require('querystring')
 const url = require('url')
 const sha1 = require('sha1')
+const parseString = require('xml2js').parseString
 
 let getTokenStartTime
 let expireSeconds
@@ -62,15 +63,13 @@ const sendTemplateMessage = (reqUrl) => {
 }
 
 const uri = {
-  '/wx/checkstatus': function (query, body) {
+  '/wx/checkstatus': function (query, bodyString) {
     const token = 'wxtoken'
     const { signature, timestamp, echostr, nonce } = query || {}
     const newLocalToken = [nonce, timestamp, token].sort().join('')
     const sha = sha1(newLocalToken)
     if (signature === sha) {
-      console.log(query)
-      console.log(body)
-      this.end(echostr)
+      bodyString ? handleMessage.call(this, bodyString) : this.end(echostr)
     } else {
       //验证失败
       this.end('error')
@@ -81,19 +80,75 @@ const uri = {
   }
 }
 
+function handleMessage (bodyString) {
+  parseString(Buffer.concat(bodyString).toString('utf-8'), { explicitArray: false }, function (err, result) {
+    if (err) {
+      //打印错误信息
+      console.log(err)
+    } else {
+      //打印解析结果
+      result = result.xml
+      const toUser = result.ToUserName //接收方微信
+      const fromUser = result.FromUserName //发送仿微信
+      if (result.Event) {
+        //处理事件类型
+        switch (result.Event) {
+          case "subscribe":
+            //关注公众号
+            break;
+          default:
+        }
+      } else {
+        //处理消息类型
+        switch (result.MsgType) {
+          case "text":
+            //处理文本消息
+            this.end(`<xml>
+  <ToUserName><![CDATA[${toUser}]]></ToUserName>
+  <FromUserName><![CDATA[${fromUser}]]></FromUserName>
+  <CreateTime>${Date.now()}</CreateTime>
+  <MsgType><![CDATA[text]]></MsgType>
+  <Content><![CDATA[你好]]></Content>
+</xml>`)
+            break;
+          case "image":
+            //处理图片消息
+            break;
+          case "voice":
+            //处理语音消息
+            break;
+          case "video":
+            //处理视频消息
+            break;
+          case "shortvideo":
+            //处理小视频消息
+            break;
+          case "location":
+            //处理发送地理位置
+            break;
+          case "link":
+            //处理点击链接消息
+            break;
+          default:
+        }
+      }
+    }
+  })
+}
+
 function send (res, obj) {
   res.writeHead(200)
   res.end(JSON.stringify(obj))
 }
 
-function handleResponse (req, res, query, body) {
+function handleResponse (req, res, query, bodyString) {
   const path = req.url.split('?')[0]
   if (!uri[path]) {
     console.log(path, '没有匹配到方法...')
     return res.end('没有匹配到方法')
   }
 
-  uri[path].call(res, query, body)
+  uri[path].call(res, query, bodyString)
 }
 
 const server = http.createServer((req, res) => {
@@ -104,7 +159,7 @@ const server = http.createServer((req, res) => {
     body += chunk
   })
   req.on('end', function(){
-    body = querystring.parse(body)
+    // body = querystring.parse(body)
     handleResponse(req, res, query, body)
   })
 
