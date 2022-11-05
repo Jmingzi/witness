@@ -45,6 +45,7 @@ async function addAv (openid, title, name, number) {
   const data = { openid, title, name, number, type: /银行/.test(title) ? 'card' : 'app' }
   const cur = await User.current()
   if (!cur) {
+    console.log('登录 AV...')
     await User.logIn('jmingzi', 'ck.123456')
   }
 
