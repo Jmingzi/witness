@@ -1,11 +1,10 @@
 const AV = require('leancloud-storage')
 const { Query, User } = AV
 
-AV.init({
-  appId: "iYzWnL2H72jtQgNQPXUvjFqU-gzGzoHsz",
-  appKey: "OR3zEynwWJ7f8bk95AdiGFzJ",
-  serverURL: "https://api.iming.work"
-})
+const appId = 'iYzWnL2H72jtQgNQPXUvjFqU-gzGzoHsz'
+const appKey = 'OR3zEynwWJ7f8bk95AdiGFzJ'
+const serverURLs = 'https://api.iming.work'
+AV.init({ appId, appKey, serverURLs })
 
 function getAv () {
   const instance = new Query('CardBag')
