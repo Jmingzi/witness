@@ -17,25 +17,15 @@ const getAccessToken = () => {
     return Promise.resolve(accessToken)
   }
   console.log('获取token')
+  const appId = 'wxb39d255a0621cedc'
+  const secret = '3605eb0e51b0afe46ff9caac64671521'
   // token 失效，需要重新获取
-  const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wx33160dea62feba36&secret=20304416114d0da2a81bc8211462fe36`
+  const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appId}&secret=${secret}`
   return axios.get(url).then(res => {
     getTokenStartTime = Date.now()
     expireSeconds = res.data.expires_in
     accessToken = res.data.access_token
     return accessToken
-  })
-}
-
-const getQuery = (url) => {
-  const search = url.substring(url.indexOf('?') + 1)
-  return querystring.parse(search)
-}
-
-const logConsole = (url) => {
-  return Promise.resolve().then(() => {
-    const params = getQuery(url)
-    console.log(params.msg || 'receive message.')
   })
 }
 
@@ -72,23 +62,36 @@ const sendTemplateMessage = (reqUrl) => {
 }
 
 const uri = {
+  '/wx/checkstatus': function (query) {
+    const token = 'wxtoken'
+    const { signature, timestamp, echostr, nonce } = query || {}
+    const newLocalToken = [nonce, timestamp, token].sort().join('')
+    const sha = sha1(newLocalToken)
+    if (signature === sha) {
+      this.end(echostr)
+    } else {
+      //验证失败
+      this.end('error')
+    }
+  },
+  '/wx/accessToken': function () {
+    this.end(getAccessToken())
+  }
+}
 
+function send (res, obj) {
+  res.writeHead(200)
+  res.end(JSON.stringify(obj))
 }
 
 function handleResponse (req, res, query, body) {
-  console.log(req.url)
-  const token = 'wxtoken'
-  const { signature, timestamp, echostr, nonce } = query || {}
-  const newLocalToken = [nonce, timestamp, token].sort().join('')
-  const sha = sha1(newLocalToken)
-  if (signature === sha) {
-    res.end(echostr)
-  } else {
-    //验证失败
-    res.end({ "message": "error" })
+  const path = req.url.split('?')[0]
+  if (!uri[path]) {
+    console.log(path, '没有匹配到方法...')
+    return res.end('没有匹配到方法')
   }
-  // res.writeHead(200)
-  // res.end(JSON.stringify({ body, query }))
+
+  uri[path].call(res, query, body)
 }
 
 const server = http.createServer((req, res) => {
