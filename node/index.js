@@ -91,7 +91,7 @@ const uri = {
  * 5：退出登录
  */
 async function getResponseText (text, { openid }) {
-  openid = 'ouYfM5pZ7lUWF1hX8p7JcBkc9-8g'
+  // openid = 'ouYfM5pZ7lUWF1hX8p7JcBkc9-8g'
   // console.log('openid', openid, 'text', text)
   const help = `可以输入如下指令进行操作：\n\n✅ 输入任意字符查询账号卡信息\n❓ 输入 0 查看帮助\n📱 输入 1 查询我的账号信息\n🏦 输入 2 查询我的卡信息\n✒️ 输入 3+建设银行+卡号+123456 添加/覆盖信息\n❌ 输入 4+建设银行+卡号，删除一条信息\n😡 输入 5，退出登录口令`
   const input = text.trim()
@@ -138,7 +138,7 @@ async function getResponseText (text, { openid }) {
   }
   const data = _.groupBy(list, 'title')
   const listInfo = Object.keys(data).map(title => {
-    const nameInfo = data[title].map(x => `${x.name}: <a href="${x.number}">${x.number}</a>`).join('\n')
+    const nameInfo = data[title].map(x => `${x.name}: <a href="https://iming.work/demo/witeness/node/copy.html?${x.number}">${x.number}</a>`).join('\n')
     return `【${title}】\n${nameInfo}`
   }).join('\n\n')
   return `${optText}\n${listInfo}`
